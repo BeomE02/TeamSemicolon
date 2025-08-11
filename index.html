@@ -253,9 +253,9 @@
             pointer-events: none;
         }
 
-        /* 카테고리 필터 - 상단 여백 수정 */
+        /* 카테고리 필터 - 상단 여백 더 증가 */
         .category-filter {
-            padding: 20px 20px 8px;
+            padding: 24px 20px 12px;
             background: var(--white);
             margin-bottom: 8px;
         }
@@ -264,7 +264,7 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 8px;
+            padding-bottom: 12px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
@@ -1175,45 +1175,48 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* 플로팅 검색 버튼 - 위치 조정 */
+        /* 플로팅 검색 버튼 - 위치와 크기 수정 */
         .search-fab {
             position: fixed;
-            bottom: 30px;
+            bottom: 100px;
             right: 20px;
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
             background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
+            font-size: 26px;
             box-shadow: 0 8px 25px rgba(239,68,68,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
             z-index: 999;
-            position: relative;
         }
 
         .search-fab-icon {
-            font-size: 24px;
+            font-size: 26px;
+            position: relative;
+            z-index: 1;
         }
 
         .search-fab-plus {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             font-size: 14px;
             font-weight: 700;
             background: var(--white);
             color: var(--secondary);
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 2;
         }
 
         .search-fab:active {
@@ -2744,9 +2747,15 @@
         });
 
         // 바코드 스캔 시작
+        let barcodeScanning = false;
         function startScanning() {
             const scanResult = document.getElementById('scanResult');
             const viewport = document.getElementById('scanner-viewport');
+            
+            if (!scanResult || !viewport) {
+                console.error('Scanner elements not found');
+                return;
+            }
             
             scanResult.style.display = 'none';
             viewport.style.display = 'block';
@@ -2758,13 +2767,18 @@
                 return;
             }
             
+            // 이미 스캔 중이면 중지
+            if (barcodeScanning) {
+                stopScanning();
+            }
+            
             Quagga.init({
                 inputStream: {
                     type: "LiveStream",
                     target: viewport,
                     constraints: {
-                        width: 640,
-                        height: 480,
+                        width: { min: 640 },
+                        height: { min: 480 },
                         facingMode: "environment"
                     }
                 },
@@ -2773,6 +2787,7 @@
                     halfSample: true
                 },
                 numOfWorkers: 2,
+                frequency: 10,
                 decoder: {
                     readers: [
                         "ean_reader",
@@ -2786,38 +2801,48 @@
                 locate: true
             }, function(err) {
                 if (err) {
-                    console.log('Scanner error:', err);
+                    console.error('Scanner init error:', err);
                     showToast('카메라를 사용할 수 없습니다');
                     fallbackToFileUpload();
                     return;
                 }
-                console.log("바코드 스캐너 시작");
+                console.log("바코드 스캐너 시작됨");
                 Quagga.start();
+                barcodeScanning = true;
             });
 
-            // 바코드 감지 시
+            // 기존 리스너 제거 후 새로 등록
+            Quagga.offDetected();
             Quagga.onDetected(function(result) {
-                const code = result.codeResult.code;
-                console.log("바코드 감지:", code);
-                
-                // 진동 피드백
-                if (navigator.vibrate) {
-                    navigator.vibrate(100);
+                if (result && result.codeResult && result.codeResult.code) {
+                    const code = result.codeResult.code;
+                    console.log("바코드 감지:", code);
+                    
+                    // 진동 피드백
+                    if (navigator.vibrate) {
+                        navigator.vibrate(100);
+                    }
+                    
+                    // 스캔 중지
+                    stopScanning();
+                    
+                    // 결과 표시
+                    showBarcodeResult(code);
                 }
-                
-                // 스캔 중지
-                stopScanning();
-                
-                // 결과 표시
-                showBarcodeResult(code);
             });
         }
 
         // 스캔 중지
         function stopScanning() {
-            if (typeof Quagga !== 'undefined' && Quagga.stop) {
-                Quagga.stop();
-                Quagga.offDetected();
+            if (typeof Quagga !== 'undefined') {
+                try {
+                    Quagga.stop();
+                    Quagga.offDetected();
+                    barcodeScanning = false;
+                    console.log("바코드 스캐너 중지됨");
+                } catch (e) {
+                    console.error('Stop scanning error:', e);
+                }
             }
         }
 
@@ -2938,7 +2963,12 @@
                     src: imageSrc,
                     numOfWorkers: 0,
                     decoder: {
-                        readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
+                        readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
+                    },
+                    locate: true,
+                    locator: {
+                        halfSample: false,
+                        patchSize: "medium"
                     }
                 }, function(result) {
                     if (result && result.codeResult) {
@@ -2947,6 +2977,8 @@
                         showToast('바코드를 인식할 수 없습니다');
                     }
                 });
+            } else {
+                showToast('바코드 스캐너를 사용할 수 없습니다');
             }
         }
 
