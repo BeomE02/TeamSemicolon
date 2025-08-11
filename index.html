@@ -1933,7 +1933,7 @@
         let selectedRating = 0;
         let likedProducts = new Set();
         let currentProduct = null;
-        let isScanning = false;
+        let scanningInterval = null;
 
         // 다국어 지원
         const translations = {
@@ -2175,15 +2175,15 @@
             }
         ];
 
-        // 초기화
+        // 초기화 - 스플래시 스크린 시간 단축
         document.addEventListener('DOMContentLoaded', function() {
-            // 스플래시 스크린 페이드아웃
+            // 스플래시 스크린 페이드아웃 (2초 → 1초로 단축)
             setTimeout(() => {
                 document.getElementById('splash').classList.add('fade-out');
                 setTimeout(() => {
                     document.getElementById('splash').style.display = 'none';
-                }, 500);
-            }, 2000);
+                }, 300);
+            }, 1000);
 
             // 제품 목록 렌더링
             renderProducts();
@@ -2596,10 +2596,15 @@
         }
 
         // 자동 스캔
-        let isScanning = false;
+        let isAnalyzing = false;
         function startAutoScan() {
+            // 기존 인터벌 정리
+            if (window.autoScanInterval) {
+                clearInterval(window.autoScanInterval);
+            }
+            
             window.autoScanInterval = setInterval(() => {
-                if (!isScanning) {
+                if (!isAnalyzing) {
                     analyzeCurrentFrame();
                 }
             }, 3000); // 3초마다 스캔
@@ -2608,9 +2613,11 @@
         // 현재 프레임 분석
         function analyzeCurrentFrame() {
             const video = document.getElementById('cameraStream');
+            if (!video || !video.srcObject) return;
+            
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0);
             
@@ -2622,9 +2629,14 @@
         // 수동 캡처 및 분석
         function captureAndAnalyze() {
             const video = document.getElementById('cameraStream');
+            if (!video || !video.srcObject) {
+                showToast('카메라가 준비되지 않았습니다');
+                return;
+            }
+            
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0);
             
@@ -2647,7 +2659,9 @@
 
         // 이미지 분석 수행
         function performImageAnalysis(imageData, isAuto) {
-            isScanning = true;
+            if (isAnalyzing) return;
+            
+            isAnalyzing = true;
             const scanStatus = document.getElementById('scanStatus');
             scanStatus.classList.add('active');
             scanStatus.textContent = '제품 인식 중...';
@@ -2694,7 +2708,7 @@
                     
                     setTimeout(() => {
                         scanStatus.classList.remove('active');
-                        isScanning = false;
+                        isAnalyzing = false;
                     }, 2000);
                 }
             }, 1500);
@@ -2737,70 +2751,73 @@
             scanResult.style.display = 'none';
             viewport.style.display = 'block';
             
-            if (!isScanning && typeof Quagga !== 'undefined') {
-                Quagga.init({
-                    inputStream: {
-                        type: "LiveStream",
-                        target: viewport,
-                        constraints: {
-                            width: 640,
-                            height: 480,
-                            facingMode: "environment" // 후면 카메라
-                        }
-                    },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: true
-                    },
-                    numOfWorkers: 2,
-                    decoder: {
-                        readers: [
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_128_reader",
-                            "code_39_reader",
-                            "upc_reader",
-                            "upc_e_reader"
-                        ]
-                    },
-                    locate: true
-                }, function(err) {
-                    if (err) {
-                        console.log(err);
-                        showToast('카메라를 사용할 수 없습니다');
-                        // 대체: 파일 업로드 방식
-                        fallbackToFileUpload();
-                        return;
-                    }
-                    console.log("바코드 스캐너 시작");
-                    Quagga.start();
-                    isScanning = true;
-                });
-
-                // 바코드 감지 시
-                Quagga.onDetected(function(result) {
-                    const code = result.codeResult.code;
-                    console.log("바코드 감지:", code);
-                    
-                    // 진동 피드백
-                    if (navigator.vibrate) {
-                        navigator.vibrate(100);
-                    }
-                    
-                    // 스캔 중지
-                    stopScanning();
-                    
-                    // 결과 표시
-                    showBarcodeResult(code);
-                });
+            // QuaggaJS가 로드되었는지 확인
+            if (typeof Quagga === 'undefined') {
+                console.log('QuaggaJS not loaded, using fallback');
+                fallbackToFileUpload();
+                return;
             }
+            
+            Quagga.init({
+                inputStream: {
+                    type: "LiveStream",
+                    target: viewport,
+                    constraints: {
+                        width: 640,
+                        height: 480,
+                        facingMode: "environment"
+                    }
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 2,
+                decoder: {
+                    readers: [
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_128_reader",
+                        "code_39_reader",
+                        "upc_reader",
+                        "upc_e_reader"
+                    ]
+                },
+                locate: true
+            }, function(err) {
+                if (err) {
+                    console.log('Scanner error:', err);
+                    showToast('카메라를 사용할 수 없습니다');
+                    fallbackToFileUpload();
+                    return;
+                }
+                console.log("바코드 스캐너 시작");
+                Quagga.start();
+            });
+
+            // 바코드 감지 시
+            Quagga.onDetected(function(result) {
+                const code = result.codeResult.code;
+                console.log("바코드 감지:", code);
+                
+                // 진동 피드백
+                if (navigator.vibrate) {
+                    navigator.vibrate(100);
+                }
+                
+                // 스캔 중지
+                stopScanning();
+                
+                // 결과 표시
+                showBarcodeResult(code);
+            });
         }
 
         // 스캔 중지
         function stopScanning() {
-            if (isScanning && typeof Quagga !== 'undefined') {
+            if (typeof Quagga !== 'undefined' && Quagga.stop) {
                 Quagga.stop();
-                isScanning = false;
+                Quagga.offDetected();
             }
         }
 
