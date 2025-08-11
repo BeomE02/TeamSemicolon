@@ -907,8 +907,278 @@
             transform: scale(0.98);
         }
 
-        /* 플로팅 카메라 버튼 */
-        .camera-fab {
+        /* 검색 옵션 모달 */
+        .search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-modal.active {
+            display: flex;
+        }
+
+        .search-modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            animation: slideUp 0.3s ease;
+        }
+
+        .search-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .search-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-option:active {
+            transform: scale(0.98);
+            background: #E5E7EB;
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .option-info {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .option-arrow {
+            font-size: 24px;
+            color: var(--light-gray);
+        }
+
+        .contact-section {
+            padding-top: 20px;
+            border-top: 1px solid var(--bg-gray);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #5B5FDE 0%, #8B5CF6 100%);
+            color: var(--white);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .contact-link:active {
+            transform: scale(0.95);
+        }
+
+        /* 이미지 검색 모달 */
+        .image-search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--white);
+            z-index: 3000;
+            display: none;
+            flex-direction: column;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .image-search-modal.active {
+            display: flex;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+
+        .image-search-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-search-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            padding-top: calc(16px + var(--safe-top));
+            background: var(--white);
+            border-bottom: 1px solid var(--bg-gray);
+        }
+
+        .search-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .close-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg-gray);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .image-preview-area {
+            flex: 1;
+            margin: 20px;
+            border: 2px dashed var(--light-gray);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-gray);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .upload-subtext {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .image-preview-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .image-search-actions {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .capture-btn, .gallery-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: var(--radius-md);
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .capture-btn {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            color: var(--white);
+        }
+
+        .gallery-btn {
+            background: var(--bg-gray);
+            color: var(--dark);
+        }
+
+        .capture-btn:active, .gallery-btn:active {
+            transform: scale(0.95);
+        }
+
+        .search-tips {
+            padding: 20px;
+            background: var(--bg-gray);
+            margin: 20px;
+            border-radius: var(--radius-md);
+        }
+
+        .tip-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .tip-list {
+            margin: 0;
+            padding-left: 20px;
+            font-size: 13px;
+            color: var(--gray);
+            line-height: 1.6;
+        }
+
+        /* 플로팅 검색 버튼 */
+        .search-fab {
             position: fixed;
             bottom: calc(90px + var(--safe-bottom));
             right: 20px;
@@ -920,20 +1190,40 @@
             align-items: center;
             justify-content: center;
             color: var(--white);
-            font-size: 24px;
             box-shadow: 0 8px 24px rgba(255,107,107,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
             z-index: 90;
+            position: relative;
         }
 
-        .camera-fab:active {
+        .search-fab-icon {
+            font-size: 24px;
+        }
+
+        .search-fab-plus {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--white);
+            color: var(--secondary);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-fab:active {
             transform: scale(0.92);
             box-shadow: 0 4px 16px rgba(255,107,107,0.5);
         }
 
-        /* 하단 네비게이션 */
+        /* 바코드 스캔 모달 수정 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -1500,6 +1790,83 @@
             </div>
         </div>
 
+        <!-- 검색 옵션 모달 -->
+        <div class="search-modal" id="searchModal">
+            <div class="search-modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">상품 검색</div>
+                    <button class="modal-close" onclick="closeSearchModal()">✕</button>
+                </div>
+                
+                <div class="search-options">
+                    <div class="search-option" onclick="openImageSearch()">
+                        <div class="option-icon">📸</div>
+                        <div class="option-info">
+                            <div class="option-title">이미지로 검색</div>
+                            <div class="option-desc">제품 사진을 찍어서 검색하세요</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+                    
+                    <div class="search-option" onclick="openBarcodeScanner()">
+                        <div class="option-icon">📊</div>
+                        <div class="option-info">
+                            <div class="option-title">바코드 스캔</div>
+                            <div class="option-desc">바코드를 스캔하여 정확한 제품 찾기</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+                </div>
+                
+                <div class="contact-section">
+                    <div class="contact-text">찾는 제품이 없나요?</div>
+                    <a href="mailto:support@koko-app.com?subject=제품 문의" class="contact-link">
+                        <span>📧</span>
+                        <span>문의하기</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 이미지 검색 모달 -->
+        <div class="image-search-modal" id="imageSearchModal">
+            <div class="image-search-content">
+                <div class="image-search-header">
+                    <button class="back-button" onclick="backToSearchModal()">←</button>
+                    <div class="search-title">이미지로 검색</div>
+                    <button class="close-button" onclick="closeImageSearch()">✕</button>
+                </div>
+                
+                <div class="image-preview-area" id="imagePreview">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">제품 사진을 찍어주세요</div>
+                        <div class="upload-subtext">패키지 전면이 잘 보이게 촬영해주세요</div>
+                    </div>
+                </div>
+                
+                <div class="image-search-actions">
+                    <button class="capture-btn" onclick="captureImage()">
+                        <span>📸</span>
+                        <span>사진 촬영</span>
+                    </button>
+                    <button class="gallery-btn" onclick="selectFromGallery()">
+                        <span>🖼️</span>
+                        <span>갤러리에서 선택</span>
+                    </button>
+                </div>
+                
+                <div class="search-tips">
+                    <div class="tip-title">📌 촬영 팁</div>
+                    <ul class="tip-list">
+                        <li>제품명이 잘 보이도록 촬영</li>
+                        <li>밝은 곳에서 촬영</li>
+                        <li>흔들리지 않게 촬영</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
         <!-- 바코드 스캔 모달 -->
         <div class="barcode-modal" id="barcodeModal">
             <div class="barcode-modal-content">
@@ -1539,8 +1906,11 @@
             </div>
         </div>
 
-        <!-- 플로팅 카메라 버튼 -->
-        <button class="camera-fab" onclick="openCamera()">📷</button>
+        <!-- 플로팅 검색 버튼 -->
+        <button class="search-fab" onclick="openSearchModal()">
+            <span class="search-fab-icon">🔍</span>
+            <span class="search-fab-plus">+</span>
+        </button>
 
         <!-- 하단 네비게이션 -->
         <nav class="bottom-nav">
@@ -2172,17 +2542,191 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 카메라 열기 - 바코드 스캔
-        function openCamera() {
+        // 검색 모달 열기
+        function openSearchModal() {
             // 햅틱 피드백
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
             
-            // 바코드 스캔 모달 열기
+            document.getElementById('searchModal').classList.add('active');
+        }
+
+        // 검색 모달 닫기
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.remove('active');
+        }
+
+        // 이미지 검색 열기
+        function openImageSearch() {
+            closeSearchModal();
+            document.getElementById('imageSearchModal').classList.add('active');
+        }
+
+        // 이미지 검색 닫기
+        function closeImageSearch() {
+            document.getElementById('imageSearchModal').classList.remove('active');
+            // 이미지 프리뷰 초기화
+            resetImagePreview();
+        }
+
+        // 검색 모달로 돌아가기
+        function backToSearchModal() {
+            closeImageSearch();
+            openSearchModal();
+        }
+
+        // 바코드 스캐너 열기
+        function openBarcodeScanner() {
+            closeSearchModal();
             document.getElementById('barcodeModal').classList.add('active');
             startScanning();
         }
+
+        // 이미지 촬영
+        function captureImage() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    processImage(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        // 갤러리에서 선택
+        function selectFromGallery() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    processImage(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        // 이미지 처리
+        function processImage(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // 이미지 프리뷰 표시
+                const imagePreview = document.getElementById('imagePreview');
+                imagePreview.innerHTML = `
+                    <img src="${e.target.result}" alt="Product Image">
+                    <div class="processing-overlay">
+                        <div class="loading-spinner"></div>
+                        <div style="color: white; margin-top: 10px;">이미지 분석 중...</div>
+                    </div>
+                `;
+                
+                // 이미지 분석 시뮬레이션 (실제로는 AI API 호출)
+                setTimeout(() => {
+                    analyzeImage(e.target.result);
+                }, 2000);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // 이미지 분석 (AI 처리 시뮬레이션)
+        function analyzeImage(imageSrc) {
+            // 실제로는 Google Vision API 또는 Custom AI 모델 사용
+            // 여기서는 시뮬레이션
+            
+            const mockResults = [
+                { name: '신라면', confidence: 0.95 },
+                { name: '진라면', confidence: 0.72 },
+                { name: '너구리', confidence: 0.65 }
+            ];
+            
+            // 가장 확률 높은 제품 찾기
+            const bestMatch = mockResults[0];
+            
+            if (bestMatch.confidence > 0.8) {
+                // 제품 찾음
+                const product = products.find(p => 
+                    p.name.ko.includes(bestMatch.name)
+                );
+                
+                if (product) {
+                    showToast(`${product.name[currentLang]} 제품을 찾았습니다!`);
+                    setTimeout(() => {
+                        closeImageSearch();
+                        showProductDetail(product);
+                    }, 1500);
+                } else {
+                    showImageSearchResults(mockResults);
+                }
+            } else {
+                showToast('제품을 찾을 수 없습니다. 다시 촬영해주세요.');
+                resetImagePreview();
+            }
+        }
+
+        // 이미지 검색 결과 표시
+        function showImageSearchResults(results) {
+            const imagePreview = document.getElementById('imagePreview');
+            imagePreview.innerHTML = `
+                <div style="padding: 20px; width: 100%;">
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">검색 결과</div>
+                    ${results.map(r => `
+                        <div style="padding: 12px; background: #f3f4f6; border-radius: 8px; margin-bottom: 8px;">
+                            <div style="font-weight: 600;">${r.name}</div>
+                            <div style="font-size: 12px; color: #6b7280;">일치율: ${Math.round(r.confidence * 100)}%</div>
+                        </div>
+                    `).join('')}
+                    <button onclick="resetImagePreview()" style="width: 100%; padding: 12px; background: #5B5FDE; color: white; border: none; border-radius: 8px; margin-top: 16px; font-weight: 600;">다시 촬영</button>
+                </div>
+            `;
+        }
+
+        // 이미지 프리뷰 초기화
+        function resetImagePreview() {
+            document.getElementById('imagePreview').innerHTML = `
+                <div class="upload-placeholder">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">제품 사진을 찍어주세요</div>
+                    <div class="upload-subtext">패키지 전면이 잘 보이게 촬영해주세요</div>
+                </div>
+            `;
+        }
+
+        // Processing overlay 스타일 추가
+        const style = document.createElement('style');
+        style.textContent = `
+            .processing-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 검색 모달 외부 클릭 시 닫기
+        document.getElementById('searchModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeSearchModal();
+            }
+        });
 
         // 바코드 스캔 시작
         function startScanning() {
