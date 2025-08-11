@@ -1000,6 +1000,251 @@
             text-align: center;
         }
 
+        /* 바코드 스캔 모달 */
+        .barcode-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 3000;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .barcode-modal.active {
+            display: block;
+        }
+
+        .barcode-modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 400px;
+            margin: 50px auto;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .barcode-header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--white);
+        }
+
+        .close-scan-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: var(--white);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-title {
+            font-size: 18px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+            margin-right: 32px;
+        }
+
+        .scanner-container {
+            position: relative;
+            background: #000;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        #scanner-viewport {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #scanner-viewport video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-guide {
+            width: 250px;
+            height: 100px;
+            position: relative;
+        }
+
+        .scan-corners {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #00ff00;
+        }
+
+        .corner.top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner.top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner.bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-50px); }
+            100% { transform: translateY(50px); }
+        }
+
+        .scan-instruction {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .scan-result {
+            background: var(--bg-gray);
+            padding: 30px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .result-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .barcode-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-family: monospace;
+        }
+
+        .product-found {
+            font-size: 16px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .scan-again-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #5B5FDE 0%, #8B5CF6 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .manual-input {
+            padding: 20px;
+            background: var(--bg-gray);
+            border-top: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .manual-text {
+            font-size: 12px;
+            color: var(--gray);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .barcode-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: var(--radius-md);
+            font-size: 16px;
+            font-family: monospace;
+            text-align: center;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        .barcode-input:focus {
+            border-color: var(--primary);
+        }
+
+        .search-barcode-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* 토스트 메시지 */
         .toast {
             position: fixed;
@@ -1255,6 +1500,45 @@
             </div>
         </div>
 
+        <!-- 바코드 스캔 모달 -->
+        <div class="barcode-modal" id="barcodeModal">
+            <div class="barcode-modal-content">
+                <div class="barcode-header">
+                    <button class="close-scan-btn" onclick="closeScanner()">✕</button>
+                    <div class="scan-title">바코드 스캔</div>
+                </div>
+                <div class="scanner-container">
+                    <div id="scanner-viewport">
+                        <div class="scan-overlay">
+                            <div class="scan-guide">
+                                <div class="scan-corners">
+                                    <div class="corner top-left"></div>
+                                    <div class="corner top-right"></div>
+                                    <div class="corner bottom-left"></div>
+                                    <div class="corner bottom-right"></div>
+                                </div>
+                                <div class="scan-line"></div>
+                            </div>
+                            <div class="scan-instruction">바코드를 화면 중앙에 맞춰주세요</div>
+                        </div>
+                    </div>
+                    <div class="scan-result" id="scanResult" style="display:none">
+                        <div class="result-icon">✅</div>
+                        <div class="result-text">
+                            <div class="barcode-number" id="barcodeNumber"></div>
+                            <div class="product-found" id="productFound"></div>
+                        </div>
+                        <button class="scan-again-btn" onclick="startScanning()">다시 스캔</button>
+                    </div>
+                </div>
+                <div class="manual-input">
+                    <div class="manual-text">또는 바코드 번호 직접 입력</div>
+                    <input type="text" class="barcode-input" id="manualBarcode" placeholder="8801234567890">
+                    <button class="search-barcode-btn" onclick="searchByBarcode()">검색</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 플로팅 카메라 버튼 -->
         <button class="camera-fab" onclick="openCamera()">📷</button>
 
@@ -1279,12 +1563,16 @@
         <div class="toast" id="toast"></div>
     </div>
 
+    <!-- QuaggaJS 바코드 스캔 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    
     <script>
         // 전역 변수
         let currentLang = 'ko';
         let selectedRating = 0;
         let likedProducts = new Set();
         let currentProduct = null;
+        let isScanning = false;
 
         // 다국어 지원
         const translations = {
@@ -1884,26 +2172,235 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 카메라 열기
+        // 카메라 열기 - 바코드 스캔
         function openCamera() {
-            // 햅틱 피드백 (지원하는 기기에서)
+            // 햅틱 피드백
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
             
-            showToast(translations[currentLang].toast.camera);
-            
-            // 실제 구현시 카메라 API 사용
-            // if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            //     navigator.mediaDevices.getUserMedia({ video: true })
-            //         .then(stream => {
-            //             // 카메라 스트림 처리
-            //         })
-            //         .catch(err => {
-            //             console.error('Camera error:', err);
-            //         });
-            // }
+            // 바코드 스캔 모달 열기
+            document.getElementById('barcodeModal').classList.add('active');
+            startScanning();
         }
+
+        // 바코드 스캔 시작
+        function startScanning() {
+            const scanResult = document.getElementById('scanResult');
+            const viewport = document.getElementById('scanner-viewport');
+            
+            scanResult.style.display = 'none';
+            viewport.style.display = 'block';
+            
+            if (!isScanning && typeof Quagga !== 'undefined') {
+                Quagga.init({
+                    inputStream: {
+                        type: "LiveStream",
+                        target: viewport,
+                        constraints: {
+                            width: 640,
+                            height: 480,
+                            facingMode: "environment" // 후면 카메라
+                        }
+                    },
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: true
+                    },
+                    numOfWorkers: 2,
+                    decoder: {
+                        readers: [
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_128_reader",
+                            "code_39_reader",
+                            "upc_reader",
+                            "upc_e_reader"
+                        ]
+                    },
+                    locate: true
+                }, function(err) {
+                    if (err) {
+                        console.log(err);
+                        showToast('카메라를 사용할 수 없습니다');
+                        // 대체: 파일 업로드 방식
+                        fallbackToFileUpload();
+                        return;
+                    }
+                    console.log("바코드 스캐너 시작");
+                    Quagga.start();
+                    isScanning = true;
+                });
+
+                // 바코드 감지 시
+                Quagga.onDetected(function(result) {
+                    const code = result.codeResult.code;
+                    console.log("바코드 감지:", code);
+                    
+                    // 진동 피드백
+                    if (navigator.vibrate) {
+                        navigator.vibrate(100);
+                    }
+                    
+                    // 스캔 중지
+                    stopScanning();
+                    
+                    // 결과 표시
+                    showBarcodeResult(code);
+                });
+            }
+        }
+
+        // 스캔 중지
+        function stopScanning() {
+            if (isScanning && typeof Quagga !== 'undefined') {
+                Quagga.stop();
+                isScanning = false;
+            }
+        }
+
+        // 스캐너 닫기
+        function closeScanner() {
+            stopScanning();
+            document.getElementById('barcodeModal').classList.remove('active');
+        }
+
+        // 바코드 결과 표시
+        function showBarcodeResult(barcode) {
+            const scanResult = document.getElementById('scanResult');
+            const viewport = document.getElementById('scanner-viewport');
+            const barcodeNumber = document.getElementById('barcodeNumber');
+            const productFound = document.getElementById('productFound');
+            
+            viewport.style.display = 'none';
+            scanResult.style.display = 'block';
+            
+            barcodeNumber.textContent = barcode;
+            
+            // 바코드로 제품 검색
+            const product = searchProductByBarcode(barcode);
+            
+            if (product) {
+                productFound.textContent = `${product.name[currentLang]} 찾았습니다!`;
+                
+                // 2초 후 제품 상세 페이지로 이동
+                setTimeout(() => {
+                    closeScanner();
+                    showProductDetail(product);
+                }, 1500);
+            } else {
+                productFound.textContent = '제품을 찾을 수 없습니다. 제품 추가 요청을 해주세요.';
+                
+                // 제품 추가 요청 버튼 표시
+                setTimeout(() => {
+                    requestNewProduct(barcode);
+                }, 2000);
+            }
+        }
+
+        // 바코드로 제품 검색
+        function searchProductByBarcode(barcode) {
+            // 샘플 바코드 데이터베이스
+            const barcodeDB = {
+                '8801043035361': products[0], // 신라면
+                '8809685819183': products[1], // 이니스프리
+                '8806011611684': products[2], // 정관장
+                '8801043031226': products[3], // 불닭볶음면
+                '8809581506046': products[4], // 미샤
+                '8801234567890': products[5]  // 다우니
+            };
+            
+            return barcodeDB[barcode] || null;
+        }
+
+        // 수동 바코드 검색
+        function searchByBarcode() {
+            const manualBarcode = document.getElementById('manualBarcode').value.trim();
+            
+            if (manualBarcode.length < 8) {
+                showToast('올바른 바코드 번호를 입력해주세요');
+                return;
+            }
+            
+            showBarcodeResult(manualBarcode);
+        }
+
+        // 새 제품 추가 요청
+        function requestNewProduct(barcode) {
+            showToast('제품 추가 요청이 접수되었습니다');
+            
+            // 실제로는 서버에 요청을 보냄
+            const newRequest = {
+                barcode: barcode,
+                timestamp: Date.now(),
+                userId: 'anonymous',
+                status: 'pending'
+            };
+            
+            console.log('New product request:', newRequest);
+            
+            // 로컬 스토리지에 임시 저장
+            let requests = JSON.parse(localStorage.getItem('productRequests') || '[]');
+            requests.push(newRequest);
+            localStorage.setItem('productRequests', JSON.stringify(requests));
+            
+            closeScanner();
+        }
+
+        // 파일 업로드 대체 방식
+        function fallbackToFileUpload() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.capture = 'environment';
+            
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // 이미지에서 바코드 읽기
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        decodeImageBarcode(e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            input.click();
+        }
+
+        // 이미지에서 바코드 디코딩
+        function decodeImageBarcode(imageSrc) {
+            if (typeof Quagga !== 'undefined') {
+                Quagga.decodeSingle({
+                    src: imageSrc,
+                    numOfWorkers: 0,
+                    decoder: {
+                        readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
+                    }
+                }, function(result) {
+                    if (result && result.codeResult) {
+                        showBarcodeResult(result.codeResult.code);
+                    } else {
+                        showToast('바코드를 인식할 수 없습니다');
+                    }
+                });
+            }
+        }
+
+        // 바코드 모달 외부 클릭 시 닫기
+        document.getElementById('barcodeModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeScanner();
+            }
+        });
+
+        // 엔터키로 바코드 검색
+        document.getElementById('manualBarcode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchByBarcode();
+            }
+        });
 
         // 공유하기
         function shareProduct() {
