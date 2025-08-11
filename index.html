@@ -253,9 +253,9 @@
             pointer-events: none;
         }
 
-        /* 카테고리 필터 */
+        /* 카테고리 필터 - 상단 여백 수정 */
         .category-filter {
-            padding: 16px 20px 8px;
+            padding: 20px 20px 8px;
             background: var(--white);
             margin-bottom: 8px;
         }
@@ -1021,14 +1021,14 @@
             transform: scale(0.95);
         }
 
-        /* 이미지 검색 모달 */
+        /* 이미지 검색 모달 - 실시간 카메라 */
         .image-search-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--white);
+            background: #000;
             z-index: 3000;
             display: none;
             flex-direction: column;
@@ -1039,162 +1039,160 @@
             display: flex;
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        .image-search-content {
+        .camera-viewport {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .image-search-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px;
-            padding-top: calc(16px + var(--safe-top));
-            background: var(--white);
-            border-bottom: 1px solid var(--bg-gray);
-        }
-
-        .search-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        .close-button {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--bg-gray);
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .image-preview-area {
-            flex: 1;
-            margin: 20px;
-            border: 2px dashed var(--light-gray);
-            border-radius: var(--radius-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-gray);
             position: relative;
             overflow: hidden;
+            background: #000;
         }
 
-        .upload-placeholder {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .upload-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-        }
-
-        .upload-text {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-            margin-bottom: 8px;
-        }
-
-        .upload-subtext {
-            font-size: 13px;
-            color: var(--gray);
-        }
-
-        .image-preview-area img {
+        #cameraStream {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
 
-        .image-search-actions {
-            padding: 20px;
-            display: flex;
-            gap: 12px;
+        .scan-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 280px;
+            pointer-events: none;
         }
 
-        .capture-btn, .gallery-btn {
-            flex: 1;
-            padding: 14px;
-            border-radius: var(--radius-md);
-            border: none;
-            font-size: 15px;
+        .scan-frame .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #00ff00;
+        }
+
+        .scan-frame .corner.top-left {
+            top: 0;
+            left: 0;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .scan-frame .corner.top-right {
+            top: 0;
+            right: 0;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .scan-frame .corner.bottom-left {
+            bottom: 0;
+            left: 0;
+            border-right: none;
+            border-top: none;
+        }
+
+        .scan-frame .corner.bottom-right {
+            bottom: 0;
+            right: 0;
+            border-left: none;
+            border-top: none;
+        }
+
+        .scan-instruction {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            transform: translateY(-180px);
+            text-align: center;
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 500;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .scan-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 180px);
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.7);
+            color: #00ff00;
+            border-radius: 20px;
+            font-size: 14px;
             font-weight: 600;
+            display: none;
+        }
+
+        .scan-status.active {
+            display: block;
+            animation: pulse 1.5s infinite;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            padding-bottom: calc(30px + var(--safe-bottom));
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            text-align: center;
+        }
+
+        .capture-button {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 4px solid rgba(255,255,255,0.3);
             cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
         }
 
-        .capture-btn {
+        .capture-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+        }
+
+        .capture-button:active {
+            transform: scale(0.9);
+        }
+
+        .capture-button:active .capture-icon {
+            background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
+        }
+
+        .camera-tip {
             color: var(--white);
-        }
-
-        .gallery-btn {
-            background: var(--bg-gray);
-            color: var(--dark);
-        }
-
-        .capture-btn:active, .gallery-btn:active {
-            transform: scale(0.95);
-        }
-
-        .search-tips {
-            padding: 20px;
-            background: var(--bg-gray);
-            margin: 20px;
-            border-radius: var(--radius-md);
-        }
-
-        .tip-title {
             font-size: 14px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        .tip-list {
-            margin: 0;
-            padding-left: 20px;
-            font-size: 13px;
-            color: var(--gray);
-            line-height: 1.6;
-        }
-
-        /* 플로팅 검색 버튼 */
+        /* 플로팅 검색 버튼 - 위치 조정 */
         .search-fab {
             position: fixed;
-            bottom: calc(90px + var(--safe-bottom));
+            bottom: 30px;
             right: 20px;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
-            box-shadow: 0 8px 24px rgba(255,107,107,0.4);
+            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
-            z-index: 90;
+            z-index: 999;
             position: relative;
         }
 
@@ -1219,8 +1217,8 @@
         }
 
         .search-fab:active {
-            transform: scale(0.92);
-            box-shadow: 0 4px 16px rgba(255,107,107,0.5);
+            transform: scale(0.95);
+            box-shadow: 0 6px 20px rgba(239,68,68,0.5);
         }
 
         /* 바코드 스캔 모달 수정 */
@@ -1828,7 +1826,7 @@
             </div>
         </div>
 
-        <!-- 이미지 검색 모달 -->
+        <!-- 이미지 검색 모달 (실시간 카메라) -->
         <div class="image-search-modal" id="imageSearchModal">
             <div class="image-search-content">
                 <div class="image-search-header">
@@ -1837,32 +1835,25 @@
                     <button class="close-button" onclick="closeImageSearch()">✕</button>
                 </div>
                 
-                <div class="image-preview-area" id="imagePreview">
-                    <div class="upload-placeholder">
-                        <div class="upload-icon">📷</div>
-                        <div class="upload-text">제품 사진을 찍어주세요</div>
-                        <div class="upload-subtext">패키지 전면이 잘 보이게 촬영해주세요</div>
+                <div class="camera-viewport" id="cameraViewport">
+                    <video id="cameraStream" autoplay playsinline></video>
+                    <div class="scan-overlay">
+                        <div class="scan-frame">
+                            <div class="corner top-left"></div>
+                            <div class="corner top-right"></div>
+                            <div class="corner bottom-left"></div>
+                            <div class="corner bottom-right"></div>
+                        </div>
+                        <div class="scan-instruction">제품을 화면에 맞춰주세요</div>
+                        <div class="scan-status" id="scanStatus">스캔 중...</div>
                     </div>
                 </div>
                 
-                <div class="image-search-actions">
-                    <button class="capture-btn" onclick="captureImage()">
-                        <span>📸</span>
-                        <span>사진 촬영</span>
+                <div class="camera-controls">
+                    <button class="capture-button" onclick="captureAndAnalyze()">
+                        <div class="capture-icon"></div>
                     </button>
-                    <button class="gallery-btn" onclick="selectFromGallery()">
-                        <span>🖼️</span>
-                        <span>갤러리에서 선택</span>
-                    </button>
-                </div>
-                
-                <div class="search-tips">
-                    <div class="tip-title">📌 촬영 팁</div>
-                    <ul class="tip-list">
-                        <li>제품명이 잘 보이도록 촬영</li>
-                        <li>밝은 곳에서 촬영</li>
-                        <li>흔들리지 않게 촬영</li>
-                    </ul>
+                    <div class="camera-tip">제품명이 잘 보이도록 촬영하세요</div>
                 </div>
             </div>
         </div>
@@ -2557,169 +2548,179 @@
             document.getElementById('searchModal').classList.remove('active');
         }
 
-        // 이미지 검색 열기
+        // 이미지 검색 열기 - 실시간 카메라
         function openImageSearch() {
             closeSearchModal();
             document.getElementById('imageSearchModal').classList.add('active');
+            startCamera();
+        }
+
+        // 카메라 시작
+        function startCamera() {
+            const video = document.getElementById('cameraStream');
+            
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    } 
+                })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                    
+                    // 자동 스캔 시작 (3초마다)
+                    startAutoScan();
+                })
+                .catch(err => {
+                    console.error('카메라 접근 실패:', err);
+                    showToast('카메라를 사용할 수 없습니다');
+                });
+            }
+        }
+
+        // 카메라 정지
+        function stopCamera() {
+            const video = document.getElementById('cameraStream');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+            
+            // 자동 스캔 중지
+            if (window.autoScanInterval) {
+                clearInterval(window.autoScanInterval);
+            }
+        }
+
+        // 자동 스캔
+        let isScanning = false;
+        function startAutoScan() {
+            window.autoScanInterval = setInterval(() => {
+                if (!isScanning) {
+                    analyzeCurrentFrame();
+                }
+            }, 3000); // 3초마다 스캔
+        }
+
+        // 현재 프레임 분석
+        function analyzeCurrentFrame() {
+            const video = document.getElementById('cameraStream');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // 캡처된 이미지 분석
+            const imageData = canvas.toDataURL('image/jpeg');
+            performImageAnalysis(imageData, true);
+        }
+
+        // 수동 캡처 및 분석
+        function captureAndAnalyze() {
+            const video = document.getElementById('cameraStream');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+            
+            // 진동 피드백
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            // 캡처 효과
+            const viewport = document.querySelector('.camera-viewport');
+            viewport.style.animation = 'flash 0.3s ease';
+            setTimeout(() => {
+                viewport.style.animation = '';
+            }, 300);
+            
+            // 캡처된 이미지 분석
+            const imageData = canvas.toDataURL('image/jpeg');
+            performImageAnalysis(imageData, false);
+        }
+
+        // 이미지 분석 수행
+        function performImageAnalysis(imageData, isAuto) {
+            isScanning = true;
+            const scanStatus = document.getElementById('scanStatus');
+            scanStatus.classList.add('active');
+            scanStatus.textContent = '제품 인식 중...';
+            
+            // AI 분석 시뮬레이션 (실제로는 Vision API 호출)
+            setTimeout(() => {
+                // 모의 제품 인식 결과
+                const mockProducts = [
+                    { product: products[0], confidence: 0.92 }, // 신라면
+                    { product: products[3], confidence: 0.85 }, // 불닭볶음면
+                ];
+                
+                const random = Math.random();
+                let recognizedProduct = null;
+                
+                // 30% 확률로 제품 인식 성공
+                if (random < 0.3) {
+                    recognizedProduct = mockProducts[Math.floor(Math.random() * mockProducts.length)];
+                }
+                
+                if (recognizedProduct && recognizedProduct.confidence > 0.8) {
+                    // 제품 인식 성공
+                    scanStatus.textContent = `${recognizedProduct.product.name[currentLang]} 인식!`;
+                    scanStatus.style.color = '#00ff00';
+                    
+                    // 진동 피드백
+                    if (navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
+                    
+                    // 1초 후 상세 페이지로 이동
+                    setTimeout(() => {
+                        stopCamera();
+                        closeImageSearch();
+                        showProductDetail(recognizedProduct.product);
+                        showToast(`${recognizedProduct.product.name[currentLang]}을(를) 찾았습니다!`);
+                    }, 1000);
+                } else {
+                    // 제품 인식 실패
+                    if (!isAuto) {
+                        scanStatus.textContent = '제품을 인식할 수 없습니다';
+                        scanStatus.style.color = '#ff6b6b';
+                    }
+                    
+                    setTimeout(() => {
+                        scanStatus.classList.remove('active');
+                        isScanning = false;
+                    }, 2000);
+                }
+            }, 1500);
         }
 
         // 이미지 검색 닫기
         function closeImageSearch() {
             document.getElementById('imageSearchModal').classList.remove('active');
-            // 이미지 프리뷰 초기화
-            resetImagePreview();
+            stopCamera();
         }
 
-        // 검색 모달로 돌아가기
-        function backToSearchModal() {
-            closeImageSearch();
-            openSearchModal();
-        }
-
-        // 바코드 스캐너 열기
-        function openBarcodeScanner() {
-            closeSearchModal();
-            document.getElementById('barcodeModal').classList.add('active');
-            startScanning();
-        }
-
-        // 이미지 촬영
-        function captureImage() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.capture = 'environment';
-            
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    processImage(file);
-                }
-            };
-            
-            input.click();
-        }
-
-        // 갤러리에서 선택
-        function selectFromGallery() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            
-            input.onchange = function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    processImage(file);
-                }
-            };
-            
-            input.click();
-        }
-
-        // 이미지 처리
-        function processImage(file) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                // 이미지 프리뷰 표시
-                const imagePreview = document.getElementById('imagePreview');
-                imagePreview.innerHTML = `
-                    <img src="${e.target.result}" alt="Product Image">
-                    <div class="processing-overlay">
-                        <div class="loading-spinner"></div>
-                        <div style="color: white; margin-top: 10px;">이미지 분석 중...</div>
-                    </div>
-                `;
-                
-                // 이미지 분석 시뮬레이션 (실제로는 AI API 호출)
-                setTimeout(() => {
-                    analyzeImage(e.target.result);
-                }, 2000);
-            };
-            
-            reader.readAsDataURL(file);
-        }
-
-        // 이미지 분석 (AI 처리 시뮬레이션)
-        function analyzeImage(imageSrc) {
-            // 실제로는 Google Vision API 또는 Custom AI 모델 사용
-            // 여기서는 시뮬레이션
-            
-            const mockResults = [
-                { name: '신라면', confidence: 0.95 },
-                { name: '진라면', confidence: 0.72 },
-                { name: '너구리', confidence: 0.65 }
-            ];
-            
-            // 가장 확률 높은 제품 찾기
-            const bestMatch = mockResults[0];
-            
-            if (bestMatch.confidence > 0.8) {
-                // 제품 찾음
-                const product = products.find(p => 
-                    p.name.ko.includes(bestMatch.name)
-                );
-                
-                if (product) {
-                    showToast(`${product.name[currentLang]} 제품을 찾았습니다!`);
-                    setTimeout(() => {
-                        closeImageSearch();
-                        showProductDetail(product);
-                    }, 1500);
-                } else {
-                    showImageSearchResults(mockResults);
-                }
-            } else {
-                showToast('제품을 찾을 수 없습니다. 다시 촬영해주세요.');
-                resetImagePreview();
+        // 플래시 효과 CSS 추가
+        const flashStyle = document.createElement('style');
+        flashStyle.textContent = `
+            @keyframes flash {
+                0% { opacity: 1; }
+                50% { opacity: 0.3; }
+                100% { opacity: 1; }
             }
-        }
-
-        // 이미지 검색 결과 표시
-        function showImageSearchResults(results) {
-            const imagePreview = document.getElementById('imagePreview');
-            imagePreview.innerHTML = `
-                <div style="padding: 20px; width: 100%;">
-                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 16px;">검색 결과</div>
-                    ${results.map(r => `
-                        <div style="padding: 12px; background: #f3f4f6; border-radius: 8px; margin-bottom: 8px;">
-                            <div style="font-weight: 600;">${r.name}</div>
-                            <div style="font-size: 12px; color: #6b7280;">일치율: ${Math.round(r.confidence * 100)}%</div>
-                        </div>
-                    `).join('')}
-                    <button onclick="resetImagePreview()" style="width: 100%; padding: 12px; background: #5B5FDE; color: white; border: none; border-radius: 8px; margin-top: 16px; font-weight: 600;">다시 촬영</button>
-                </div>
-            `;
-        }
-
-        // 이미지 프리뷰 초기화
-        function resetImagePreview() {
-            document.getElementById('imagePreview').innerHTML = `
-                <div class="upload-placeholder">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">제품 사진을 찍어주세요</div>
-                    <div class="upload-subtext">패키지 전면이 잘 보이게 촬영해주세요</div>
-                </div>
-            `;
-        }
-
-        // Processing overlay 스타일 추가
-        const style = document.createElement('style');
-        style.textContent = `
-            .processing-overlay {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.7);
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
+            
+            @keyframes slideInRight {
+                from { transform: translateX(100%); }
+                to { transform: translateX(0); }
             }
         `;
-        document.head.appendChild(style);
+        document.head.appendChild(flashStyle);
 
         // 검색 모달 외부 클릭 시 닫기
         document.getElementById('searchModal').addEventListener('click', function(e) {
