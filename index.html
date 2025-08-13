@@ -920,66 +920,165 @@
         }
 
         /* 플로팅 검색 버튼 */
-        .fab-container {
-            position: fixed;
-            bottom: calc(90px + var(--safe-bottom));
-            right: 20px;
-            z-index: 90;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .search-fab {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
-            font-size: 24px;
-            box-shadow: 0 8px 24px rgba(255,107,107,0.4);
+            font-size: 26px;
+            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
+            z-index: 999;
         }
 
-        .search-fab:active {
-            transform: scale(0.92);
-            box-shadow: 0 4px 16px rgba(255,107,107,0.5);
+        .search-fab-icon {
+            font-size: 26px;
+            position: relative;
+            z-index: 1;
         }
 
-        .fab-options {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .fab-options.show {
-            display: flex;
-        }
-
-        .fab-option {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 8px;
+        .search-fab-plus {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--white);
+            color: var(--secondary);
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            border: none;
-            background: var(--primary);
-            color: var(--white);
-            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-md);
-            cursor: pointer;
-            transition: background 0.3s;
+            z-index: 2;
         }
 
-        .fab-option:active {
+        .search-fab:active {
+            transform: scale(0.95);
+            box-shadow: 0 6px 20px rgba(239,68,68,0.5);
+        }
+
+        /* 검색 옵션 모달 */
+        .search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-modal.active {
+            display: flex;
+        }
+
+        .search-modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            animation: slideUp 0.3s ease;
+        }
+
+        .search-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .search-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-option:active {
+            transform: scale(0.98);
+            background: #E5E7EB;
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .option-info {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .option-arrow {
+            font-size: 24px;
+            color: var(--light-gray);
+        }
+
+        .contact-section {
+            padding-top: 20px;
+            border-top: 1px solid var(--bg-gray);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #5B5FDE 0%, #8B5CF6 100%);
+            color: var(--white);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .contact-link:active {
             transform: scale(0.95);
         }
 
@@ -1593,12 +1692,47 @@
         </div>
 
         <!-- 플로팅 검색 버튼 -->
-        <div class="fab-container">
-            <div class="fab-options" id="fabOptions">
-                <button class="fab-option" onclick="openImageSearch()">🖼️</button>
-                <button class="fab-option" onclick="openBarcodeScanner()">📷</button>
+        <button class="search-fab" onclick="openSearchModal()">
+            <span class="search-fab-icon">🔍</span>
+            <span class="search-fab-plus">+</span>
+        </button>
+
+        <!-- 검색 옵션 모달 -->
+        <div class="search-modal" id="searchModal">
+            <div class="search-modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">상품 검색</div>
+                    <button class="modal-close" onclick="closeSearchModal()">✕</button>
+                </div>
+
+                <div class="search-options">
+                    <div class="search-option" onclick="openImageSearch()">
+                        <div class="option-icon">📸</div>
+                        <div class="option-info">
+                            <div class="option-title">이미지로 검색</div>
+                            <div class="option-desc">제품 사진을 찍어서 검색하세요</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+
+                    <div class="search-option" onclick="openBarcodeScanner()">
+                        <div class="option-icon">📊</div>
+                        <div class="option-info">
+                            <div class="option-title">바코드 스캔</div>
+                            <div class="option-desc">바코드를 스캔하여 정확한 제품 찾기</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+                </div>
+
+                <div class="contact-section">
+                    <div class="contact-text">찾는 제품이 없나요?</div>
+                    <a href="mailto:support@koko-app.com?subject=제품 문의" class="contact-link">
+                        <span>📧</span>
+                        <span>문의하기</span>
+                    </a>
+                </div>
             </div>
-            <button class="search-fab" onclick="toggleFabOptions()">🔍</button>
         </div>
 
         <!-- 하단 네비게이션 -->
@@ -2231,9 +2365,13 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 플로팅 검색 버튼 토글
-        function toggleFabOptions() {
-            document.getElementById('fabOptions').classList.toggle('show');
+        // 검색 옵션 모달 열기/닫기
+        function openSearchModal() {
+            document.getElementById('searchModal').classList.add('active');
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.remove('active');
         }
 
         // 이미지로 검색 (실시간 카메라 인식 예정)
@@ -2241,7 +2379,7 @@
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
-            toggleFabOptions();
+            closeSearchModal();
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                     .then(stream => {
@@ -2261,7 +2399,7 @@
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
-            toggleFabOptions();
+            closeSearchModal();
             document.getElementById('barcodeModal').classList.add('active');
             startScanning();
         }
