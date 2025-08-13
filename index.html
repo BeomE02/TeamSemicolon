@@ -253,9 +253,9 @@
             pointer-events: none;
         }
 
-        /* 카테고리 필터 - 상단 여백 더 증가 */
+        /* 카테고리 필터 */
         .category-filter {
-            padding: 24px 20px 12px;
+            padding: 16px 20px 8px;
             background: var(--white);
             margin-bottom: 8px;
         }
@@ -264,7 +264,7 @@
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding-bottom: 12px;
+            padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
         }
@@ -907,324 +907,33 @@
             transform: scale(0.98);
         }
 
-        /* 검색 옵션 모달 */
-        .search-modal {
+        /* 플로팅 카메라 버튼 */
+        .camera-fab {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 2000;
-            display: none;
-            align-items: flex-end;
-            justify-content: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .search-modal.active {
-            display: flex;
-        }
-
-        .search-modal-content {
-            background: var(--white);
-            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-            width: 100%;
-            max-width: 500px;
-            padding: 24px;
-            padding-bottom: calc(24px + var(--safe-bottom));
-            animation: slideUp 0.3s ease;
-        }
-
-        .search-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .search-option {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px;
-            background: var(--bg-gray);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .search-option:active {
-            transform: scale(0.98);
-            background: #E5E7EB;
-        }
-
-        .option-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--white);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .option-info {
-            flex: 1;
-        }
-
-        .option-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
-        }
-
-        .option-desc {
-            font-size: 13px;
-            color: var(--gray);
-        }
-
-        .option-arrow {
-            font-size: 24px;
-            color: var(--light-gray);
-        }
-
-        .contact-section {
-            padding-top: 20px;
-            border-top: 1px solid var(--bg-gray);
-            text-align: center;
-        }
-
-        .contact-text {
-            font-size: 14px;
-            color: var(--gray);
-            margin-bottom: 12px;
-        }
-
-        .contact-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #5B5FDE 0%, #8B5CF6 100%);
-            color: var(--white);
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-
-        .contact-link:active {
-            transform: scale(0.95);
-        }
-
-        /* 이미지 검색 모달 - 실시간 카메라 */
-        .image-search-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #000;
-            z-index: 3000;
-            display: none;
-            flex-direction: column;
-            animation: slideInRight 0.3s ease;
-        }
-
-        .image-search-modal.active {
-            display: flex;
-        }
-
-        .camera-viewport {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            background: #000;
-        }
-
-        #cameraStream {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .scan-frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 280px;
-            height: 280px;
-            pointer-events: none;
-        }
-
-        .scan-frame .corner {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 3px solid #00ff00;
-        }
-
-        .scan-frame .corner.top-left {
-            top: 0;
-            left: 0;
-            border-right: none;
-            border-bottom: none;
-        }
-
-        .scan-frame .corner.top-right {
-            top: 0;
-            right: 0;
-            border-left: none;
-            border-bottom: none;
-        }
-
-        .scan-frame .corner.bottom-left {
-            bottom: 0;
-            left: 0;
-            border-right: none;
-            border-top: none;
-        }
-
-        .scan-frame .corner.bottom-right {
-            bottom: 0;
-            right: 0;
-            border-left: none;
-            border-top: none;
-        }
-
-        .scan-instruction {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            transform: translateY(-180px);
-            text-align: center;
-            color: var(--white);
-            font-size: 16px;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        .scan-status {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, 180px);
-            padding: 8px 16px;
-            background: rgba(0,0,0,0.7);
-            color: #00ff00;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            display: none;
-        }
-
-        .scan-status.active {
-            display: block;
-            animation: pulse 1.5s infinite;
-        }
-
-        .camera-controls {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 30px;
-            padding-bottom: calc(30px + var(--safe-bottom));
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-            text-align: center;
-        }
-
-        .capture-button {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--white);
-            border: 4px solid rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .capture-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
-        }
-
-        .capture-button:active {
-            transform: scale(0.9);
-        }
-
-        .capture-button:active .capture-icon {
-            background: linear-gradient(135deg, #FF8E53 0%, #FF6B6B 100%);
-        }
-
-        .camera-tip {
-            color: var(--white);
-            font-size: 14px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-
-        /* 플로팅 검색 버튼 - 위치와 크기 수정 */
-        .search-fab {
-            position: fixed;
-            bottom: 100px;
+            bottom: calc(90px + var(--safe-bottom));
             right: 20px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
-            font-size: 26px;
-            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
+            font-size: 24px;
+            box-shadow: 0 8px 24px rgba(255,107,107,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
-            z-index: 999;
+            z-index: 90;
         }
 
-        .search-fab-icon {
-            font-size: 26px;
-            position: relative;
-            z-index: 1;
+        .camera-fab:active {
+            transform: scale(0.92);
+            box-shadow: 0 4px 16px rgba(255,107,107,0.5);
         }
 
-        .search-fab-plus {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            background: var(--white);
-            color: var(--secondary);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        .search-fab:active {
-            transform: scale(0.95);
-            box-shadow: 0 6px 20px rgba(239,68,68,0.5);
-        }
-
-        /* 바코드 스캔 모달 수정 */
+        /* 하단 네비게이션 */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -1791,76 +1500,6 @@
             </div>
         </div>
 
-        <!-- 검색 옵션 모달 -->
-        <div class="search-modal" id="searchModal">
-            <div class="search-modal-content">
-                <div class="modal-header">
-                    <div class="modal-title">상품 검색</div>
-                    <button class="modal-close" onclick="closeSearchModal()">✕</button>
-                </div>
-                
-                <div class="search-options">
-                    <div class="search-option" onclick="openImageSearch()">
-                        <div class="option-icon">📸</div>
-                        <div class="option-info">
-                            <div class="option-title">이미지로 검색</div>
-                            <div class="option-desc">제품 사진을 찍어서 검색하세요</div>
-                        </div>
-                        <div class="option-arrow">›</div>
-                    </div>
-                    
-                    <div class="search-option" onclick="openBarcodeScanner()">
-                        <div class="option-icon">📊</div>
-                        <div class="option-info">
-                            <div class="option-title">바코드 스캔</div>
-                            <div class="option-desc">바코드를 스캔하여 정확한 제품 찾기</div>
-                        </div>
-                        <div class="option-arrow">›</div>
-                    </div>
-                </div>
-                
-                <div class="contact-section">
-                    <div class="contact-text">찾는 제품이 없나요?</div>
-                    <a href="mailto:support@koko-app.com?subject=제품 문의" class="contact-link">
-                        <span>📧</span>
-                        <span>문의하기</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- 이미지 검색 모달 (실시간 카메라) -->
-        <div class="image-search-modal" id="imageSearchModal">
-            <div class="image-search-content">
-                <div class="image-search-header">
-                    <button class="back-button" onclick="backToSearchModal()">←</button>
-                    <div class="search-title">이미지로 검색</div>
-                    <button class="close-button" onclick="closeImageSearch()">✕</button>
-                </div>
-                
-                <div class="camera-viewport" id="cameraViewport">
-                    <video id="cameraStream" autoplay playsinline></video>
-                    <div class="scan-overlay">
-                        <div class="scan-frame">
-                            <div class="corner top-left"></div>
-                            <div class="corner top-right"></div>
-                            <div class="corner bottom-left"></div>
-                            <div class="corner bottom-right"></div>
-                        </div>
-                        <div class="scan-instruction">제품을 화면에 맞춰주세요</div>
-                        <div class="scan-status" id="scanStatus">스캔 중...</div>
-                    </div>
-                </div>
-                
-                <div class="camera-controls">
-                    <button class="capture-button" onclick="captureAndAnalyze()">
-                        <div class="capture-icon"></div>
-                    </button>
-                    <div class="camera-tip">제품명이 잘 보이도록 촬영하세요</div>
-                </div>
-            </div>
-        </div>
-
         <!-- 바코드 스캔 모달 -->
         <div class="barcode-modal" id="barcodeModal">
             <div class="barcode-modal-content">
@@ -1900,11 +1539,8 @@
             </div>
         </div>
 
-        <!-- 플로팅 검색 버튼 -->
-        <button class="search-fab" onclick="openSearchModal()">
-            <span class="search-fab-icon">🔍</span>
-            <span class="search-fab-plus">+</span>
-        </button>
+        <!-- 플로팅 카메라 버튼 -->
+        <button class="camera-fab" onclick="openCamera()">📷</button>
 
         <!-- 하단 네비게이션 -->
         <nav class="bottom-nav">
@@ -1936,7 +1572,7 @@
         let selectedRating = 0;
         let likedProducts = new Set();
         let currentProduct = null;
-        let scanningInterval = null;
+        let isScanning = false;
 
         // 다국어 지원
         const translations = {
@@ -2178,15 +1814,15 @@
             }
         ];
 
-        // 초기화 - 스플래시 스크린 시간 단축
+        // 초기화
         document.addEventListener('DOMContentLoaded', function() {
-            // 스플래시 스크린 페이드아웃 (2초 → 1초로 단축)
+            // 스플래시 스크린 페이드아웃
             setTimeout(() => {
                 document.getElementById('splash').classList.add('fade-out');
                 setTimeout(() => {
                     document.getElementById('splash').style.display = 'none';
-                }, 300);
-            }, 1000);
+                }, 500);
+            }, 2000);
 
             // 제품 목록 렌더링
             renderProducts();
@@ -2536,285 +2172,68 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 검색 모달 열기
-        function openSearchModal() {
+        // 카메라 열기 - 바코드 스캔
+        function openCamera() {
             // 햅틱 피드백
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
             
-            document.getElementById('searchModal').classList.add('active');
+            // 바코드 스캔 모달 열기
+            document.getElementById('barcodeModal').classList.add('active');
+            startScanning();
         }
-
-        // 검색 모달 닫기
-        function closeSearchModal() {
-            document.getElementById('searchModal').classList.remove('active');
-        }
-
-        // 이미지 검색 열기 - 실시간 카메라
-        function openImageSearch() {
-            closeSearchModal();
-            document.getElementById('imageSearchModal').classList.add('active');
-            startCamera();
-        }
-
-        // 카메라 시작
-        function startCamera() {
-            const video = document.getElementById('cameraStream');
-            
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1920 },
-                        height: { ideal: 1080 }
-                    } 
-                })
-                .then(stream => {
-                    video.srcObject = stream;
-                    video.play();
-                    
-                    // 자동 스캔 시작 (3초마다)
-                    startAutoScan();
-                })
-                .catch(err => {
-                    console.error('카메라 접근 실패:', err);
-                    showToast('카메라를 사용할 수 없습니다');
-                });
-            }
-        }
-
-        // 카메라 정지
-        function stopCamera() {
-            const video = document.getElementById('cameraStream');
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => track.stop());
-                video.srcObject = null;
-            }
-            
-            // 자동 스캔 중지
-            if (window.autoScanInterval) {
-                clearInterval(window.autoScanInterval);
-            }
-        }
-
-        // 자동 스캔
-        let isAnalyzing = false;
-        function startAutoScan() {
-            // 기존 인터벌 정리
-            if (window.autoScanInterval) {
-                clearInterval(window.autoScanInterval);
-            }
-            
-            window.autoScanInterval = setInterval(() => {
-                if (!isAnalyzing) {
-                    analyzeCurrentFrame();
-                }
-            }, 3000); // 3초마다 스캔
-        }
-
-        // 현재 프레임 분석
-        function analyzeCurrentFrame() {
-            const video = document.getElementById('cameraStream');
-            if (!video || !video.srcObject) return;
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            
-            // 캡처된 이미지 분석
-            const imageData = canvas.toDataURL('image/jpeg');
-            performImageAnalysis(imageData, true);
-        }
-
-        // 수동 캡처 및 분석
-        function captureAndAnalyze() {
-            const video = document.getElementById('cameraStream');
-            if (!video || !video.srcObject) {
-                showToast('카메라가 준비되지 않았습니다');
-                return;
-            }
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0);
-            
-            // 진동 피드백
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
-            }
-            
-            // 캡처 효과
-            const viewport = document.querySelector('.camera-viewport');
-            viewport.style.animation = 'flash 0.3s ease';
-            setTimeout(() => {
-                viewport.style.animation = '';
-            }, 300);
-            
-            // 캡처된 이미지 분석
-            const imageData = canvas.toDataURL('image/jpeg');
-            performImageAnalysis(imageData, false);
-        }
-
-        // 이미지 분석 수행
-        function performImageAnalysis(imageData, isAuto) {
-            if (isAnalyzing) return;
-            
-            isAnalyzing = true;
-            const scanStatus = document.getElementById('scanStatus');
-            scanStatus.classList.add('active');
-            scanStatus.textContent = '제품 인식 중...';
-            
-            // AI 분석 시뮬레이션 (실제로는 Vision API 호출)
-            setTimeout(() => {
-                // 모의 제품 인식 결과
-                const mockProducts = [
-                    { product: products[0], confidence: 0.92 }, // 신라면
-                    { product: products[3], confidence: 0.85 }, // 불닭볶음면
-                ];
-                
-                const random = Math.random();
-                let recognizedProduct = null;
-                
-                // 30% 확률로 제품 인식 성공
-                if (random < 0.3) {
-                    recognizedProduct = mockProducts[Math.floor(Math.random() * mockProducts.length)];
-                }
-                
-                if (recognizedProduct && recognizedProduct.confidence > 0.8) {
-                    // 제품 인식 성공
-                    scanStatus.textContent = `${recognizedProduct.product.name[currentLang]} 인식!`;
-                    scanStatus.style.color = '#00ff00';
-                    
-                    // 진동 피드백
-                    if (navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
-                    
-                    // 1초 후 상세 페이지로 이동
-                    setTimeout(() => {
-                        stopCamera();
-                        closeImageSearch();
-                        showProductDetail(recognizedProduct.product);
-                        showToast(`${recognizedProduct.product.name[currentLang]}을(를) 찾았습니다!`);
-                    }, 1000);
-                } else {
-                    // 제품 인식 실패
-                    if (!isAuto) {
-                        scanStatus.textContent = '제품을 인식할 수 없습니다';
-                        scanStatus.style.color = '#ff6b6b';
-                    }
-                    
-                    setTimeout(() => {
-                        scanStatus.classList.remove('active');
-                        isAnalyzing = false;
-                    }, 2000);
-                }
-            }, 1500);
-        }
-
-        // 이미지 검색 닫기
-        function closeImageSearch() {
-            document.getElementById('imageSearchModal').classList.remove('active');
-            stopCamera();
-        }
-
-        // 플래시 효과 CSS 추가
-        const flashStyle = document.createElement('style');
-        flashStyle.textContent = `
-            @keyframes flash {
-                0% { opacity: 1; }
-                50% { opacity: 0.3; }
-                100% { opacity: 1; }
-            }
-            
-            @keyframes slideInRight {
-                from { transform: translateX(100%); }
-                to { transform: translateX(0); }
-            }
-        `;
-        document.head.appendChild(flashStyle);
-
-        // 검색 모달 외부 클릭 시 닫기
-        document.getElementById('searchModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeSearchModal();
-            }
-        });
 
         // 바코드 스캔 시작
-        let barcodeScanning = false;
         function startScanning() {
             const scanResult = document.getElementById('scanResult');
             const viewport = document.getElementById('scanner-viewport');
             
-            if (!scanResult || !viewport) {
-                console.error('Scanner elements not found');
-                return;
-            }
-            
             scanResult.style.display = 'none';
             viewport.style.display = 'block';
             
-            // QuaggaJS가 로드되었는지 확인
-            if (typeof Quagga === 'undefined') {
-                console.log('QuaggaJS not loaded, using fallback');
-                fallbackToFileUpload();
-                return;
-            }
-            
-            // 이미 스캔 중이면 중지
-            if (barcodeScanning) {
-                stopScanning();
-            }
-            
-            Quagga.init({
-                inputStream: {
-                    type: "LiveStream",
-                    target: viewport,
-                    constraints: {
-                        width: { min: 640 },
-                        height: { min: 480 },
-                        facingMode: "environment"
+            if (!isScanning && typeof Quagga !== 'undefined') {
+                Quagga.init({
+                    inputStream: {
+                        type: "LiveStream",
+                        target: viewport,
+                        constraints: {
+                            width: 640,
+                            height: 480,
+                            facingMode: "environment" // 후면 카메라
+                        }
+                    },
+                    locator: {
+                        patchSize: "medium",
+                        halfSample: true
+                    },
+                    numOfWorkers: 2,
+                    decoder: {
+                        readers: [
+                            "ean_reader",
+                            "ean_8_reader",
+                            "code_128_reader",
+                            "code_39_reader",
+                            "upc_reader",
+                            "upc_e_reader"
+                        ]
+                    },
+                    locate: true
+                }, function(err) {
+                    if (err) {
+                        console.log(err);
+                        showToast('카메라를 사용할 수 없습니다');
+                        // 대체: 파일 업로드 방식
+                        fallbackToFileUpload();
+                        return;
                     }
-                },
-                locator: {
-                    patchSize: "medium",
-                    halfSample: true
-                },
-                numOfWorkers: 2,
-                frequency: 10,
-                decoder: {
-                    readers: [
-                        "ean_reader",
-                        "ean_8_reader",
-                        "code_128_reader",
-                        "code_39_reader",
-                        "upc_reader",
-                        "upc_e_reader"
-                    ]
-                },
-                locate: true
-            }, function(err) {
-                if (err) {
-                    console.error('Scanner init error:', err);
-                    showToast('카메라를 사용할 수 없습니다');
-                    fallbackToFileUpload();
-                    return;
-                }
-                console.log("바코드 스캐너 시작됨");
-                Quagga.start();
-                barcodeScanning = true;
-            });
+                    console.log("바코드 스캐너 시작");
+                    Quagga.start();
+                    isScanning = true;
+                });
 
-            // 기존 리스너 제거 후 새로 등록
-            Quagga.offDetected();
-            Quagga.onDetected(function(result) {
-                if (result && result.codeResult && result.codeResult.code) {
+                // 바코드 감지 시
+                Quagga.onDetected(function(result) {
                     const code = result.codeResult.code;
                     console.log("바코드 감지:", code);
                     
@@ -2828,21 +2247,15 @@
                     
                     // 결과 표시
                     showBarcodeResult(code);
-                }
-            });
+                });
+            }
         }
 
         // 스캔 중지
         function stopScanning() {
-            if (typeof Quagga !== 'undefined') {
-                try {
-                    Quagga.stop();
-                    Quagga.offDetected();
-                    barcodeScanning = false;
-                    console.log("바코드 스캐너 중지됨");
-                } catch (e) {
-                    console.error('Stop scanning error:', e);
-                }
+            if (isScanning && typeof Quagga !== 'undefined') {
+                Quagga.stop();
+                isScanning = false;
             }
         }
 
@@ -2963,12 +2376,7 @@
                     src: imageSrc,
                     numOfWorkers: 0,
                     decoder: {
-                        readers: ["ean_reader", "ean_8_reader", "code_128_reader", "upc_reader"]
-                    },
-                    locate: true,
-                    locator: {
-                        halfSample: false,
-                        patchSize: "medium"
+                        readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
                     }
                 }, function(result) {
                     if (result && result.codeResult) {
@@ -2977,8 +2385,6 @@
                         showToast('바코드를 인식할 수 없습니다');
                     }
                 });
-            } else {
-                showToast('바코드 스캐너를 사용할 수 없습니다');
             }
         }
 
