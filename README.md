@@ -91,6 +91,8 @@
 ### 백엔드
 - **서버**: Node.js + Express
 - **데이터베이스**: MongoDB (상품 정보, 사용자 데이터)
+  - 현재 웹 버전은 Firebase Firestore를 사용해 초기 상품/리뷰 데이터를 저장합니다.
+  - Firebase Authentication으로 구글 로그인 기능을 제공합니다.
 - **API**: RESTful API 설계
 - **클라우드**: AWS 또는 Firebase
 
