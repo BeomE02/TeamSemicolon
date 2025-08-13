@@ -255,7 +255,7 @@
 
         /* 카테고리 필터 */
         .category-filter {
-            padding: 16px 20px 8px;
+            padding: calc(var(--safe-top) + 16px) 20px 8px;
             background: var(--white);
             margin-bottom: 8px;
         }
@@ -305,6 +305,18 @@
             padding: 8px 16px;
             padding-bottom: calc(80px + var(--safe-bottom));
             min-height: calc(100vh - 200px);
+        }
+
+        .contact-link {
+            text-align: center;
+            padding: 16px 0;
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .contact-link a {
+            color: var(--primary);
+            text-decoration: none;
         }
 
         /* 제품 카드 */
@@ -907,11 +919,18 @@
             transform: scale(0.98);
         }
 
-        /* 플로팅 카메라 버튼 */
-        .camera-fab {
+        /* 플로팅 검색 버튼 */
+        .fab-container {
             position: fixed;
             bottom: calc(90px + var(--safe-bottom));
             right: 20px;
+            z-index: 90;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-fab {
             width: 56px;
             height: 56px;
             background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
@@ -925,12 +944,43 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
-            z-index: 90;
         }
 
-        .camera-fab:active {
+        .search-fab:active {
             transform: scale(0.92);
             box-shadow: 0 4px 16px rgba(255,107,107,0.5);
+        }
+
+        .fab-options {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .fab-options.show {
+            display: flex;
+        }
+
+        .fab-option {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 8px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: var(--white);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .fab-option:active {
+            transform: scale(0.95);
         }
 
         /* 하단 네비게이션 */
@@ -1370,6 +1420,9 @@
                 <div class="product-grid" id="productGrid">
                     <!-- 제품 카드들이 여기에 동적으로 생성됩니다 -->
                 </div>
+                <div class="contact-link">
+                    제품 추가 요청은 <a href="mailto:help@koko.app">help@koko.app</a> 으로 문의하세요
+                </div>
             </div>
         </div>
 
@@ -1539,8 +1592,14 @@
             </div>
         </div>
 
-        <!-- 플로팅 카메라 버튼 -->
-        <button class="camera-fab" onclick="openCamera()">📷</button>
+        <!-- 플로팅 검색 버튼 -->
+        <div class="fab-container">
+            <div class="fab-options" id="fabOptions">
+                <button class="fab-option" onclick="openImageSearch()">🖼️</button>
+                <button class="fab-option" onclick="openBarcodeScanner()">📷</button>
+            </div>
+            <button class="search-fab" onclick="toggleFabOptions()">🔍</button>
+        </div>
 
         <!-- 하단 네비게이션 -->
         <nav class="bottom-nav">
@@ -2172,14 +2231,37 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 카메라 열기 - 바코드 스캔
-        function openCamera() {
-            // 햅틱 피드백
+        // 플로팅 검색 버튼 토글
+        function toggleFabOptions() {
+            document.getElementById('fabOptions').classList.toggle('show');
+        }
+
+        // 이미지로 검색 (실시간 카메라 인식 예정)
+        function openImageSearch() {
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
-            
-            // 바코드 스캔 모달 열기
+            toggleFabOptions();
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                    .then(stream => {
+                        stream.getTracks().forEach(t => t.stop());
+                        showToast(translations[currentLang].toast.camera);
+                    })
+                    .catch(() => {
+                        showToast('카메라를 사용할 수 없습니다');
+                    });
+            } else {
+                showToast('카메라를 사용할 수 없습니다');
+            }
+        }
+
+        // 바코드 스캔 열기
+        function openBarcodeScanner() {
+            if (navigator.vibrate) {
+                navigator.vibrate(30);
+            }
+            toggleFabOptions();
             document.getElementById('barcodeModal').classList.add('active');
             startScanning();
         }
@@ -2643,6 +2725,39 @@
                 ticking = true;
             }
         }, { passive: true });
+
+        // PWA manifest 및 서비스 워커 등록
+        (function() {
+            const manifest = {
+                name: "KOKO - Korean Product Guide",
+                short_name: "KOKO",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#ffffff",
+                theme_color: "#5B5FDE"
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE = 'koko-cache-v1';
+                    self.addEventListener('install', e => {
+                        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['./'])));
+                    });
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+                    });
+                `;
+                const swBlob = new Blob([swCode], {type: 'application/javascript'});
+                const swUrl = URL.createObjectURL(swBlob);
+                navigator.serviceWorker.register(swUrl);
+            }
+        })();
 
         // 앱 초기화 완료
         console.log('KOKO App initialized successfully');
