@@ -920,66 +920,165 @@
         }
 
         /* 플로팅 검색 버튼 */
-        .fab-container {
-            position: fixed;
-            bottom: calc(90px + var(--safe-bottom));
-            right: 20px;
-            z-index: 90;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         .search-fab {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--white);
-            font-size: 24px;
-            box-shadow: 0 8px 24px rgba(255,107,107,0.4);
+            font-size: 26px;
+            box-shadow: 0 8px 25px rgba(239,68,68,0.4);
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
+            z-index: 999;
         }
 
-        .search-fab:active {
-            transform: scale(0.92);
-            box-shadow: 0 4px 16px rgba(255,107,107,0.5);
+        .search-fab-icon {
+            font-size: 26px;
+            position: relative;
+            z-index: 1;
         }
 
-        .fab-options {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .fab-options.show {
-            display: flex;
-        }
-
-        .fab-option {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 8px;
+        .search-fab-plus {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            background: var(--white);
+            color: var(--secondary);
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            border: none;
-            background: var(--primary);
-            color: var(--white);
-            font-size: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-md);
-            cursor: pointer;
-            transition: background 0.3s;
+            z-index: 2;
         }
 
-        .fab-option:active {
+        .search-fab:active {
+            transform: scale(0.95);
+            box-shadow: 0 6px 20px rgba(239,68,68,0.5);
+        }
+
+        /* 검색 옵션 모달 */
+        .search-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .search-modal.active {
+            display: flex;
+        }
+
+        .search-modal-content {
+            background: var(--white);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            animation: slideUp 0.3s ease;
+        }
+
+        .search-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .search-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-option:active {
+            transform: scale(0.98);
+            background: #E5E7EB;
+        }
+
+        .option-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--white);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .option-info {
+            flex: 1;
+        }
+
+        .option-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .option-arrow {
+            font-size: 24px;
+            color: var(--light-gray);
+        }
+
+        .contact-section {
+            padding-top: 20px;
+            border-top: 1px solid var(--bg-gray);
+            text-align: center;
+        }
+
+        .contact-text {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #5B5FDE 0%, #8B5CF6 100%);
+            color: var(--white);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .contact-link:active {
             transform: scale(0.95);
         }
 
@@ -1562,6 +1661,7 @@
                 </div>
                 <div class="scanner-container">
                     <div id="scanner-viewport">
+                        <video id="barcodeVideo" muted autoplay playsinline></video>
                         <div class="scan-overlay">
                             <div class="scan-guide">
                                 <div class="scan-corners">
@@ -1593,12 +1693,47 @@
         </div>
 
         <!-- 플로팅 검색 버튼 -->
-        <div class="fab-container">
-            <div class="fab-options" id="fabOptions">
-                <button class="fab-option" onclick="openImageSearch()">🖼️</button>
-                <button class="fab-option" onclick="openBarcodeScanner()">📷</button>
+        <button class="search-fab" onclick="openSearchModal()">
+            <span class="search-fab-icon">🔍</span>
+            <span class="search-fab-plus">+</span>
+        </button>
+
+        <!-- 검색 옵션 모달 -->
+        <div class="search-modal" id="searchModal">
+            <div class="search-modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">상품 검색</div>
+                    <button class="modal-close" onclick="closeSearchModal()">✕</button>
+                </div>
+
+                <div class="search-options">
+                    <div class="search-option" onclick="openImageSearch()">
+                        <div class="option-icon">📸</div>
+                        <div class="option-info">
+                            <div class="option-title">이미지로 검색</div>
+                            <div class="option-desc">제품 사진을 찍어서 검색하세요</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+
+                    <div class="search-option" onclick="openBarcodeScanner()">
+                        <div class="option-icon">📊</div>
+                        <div class="option-info">
+                            <div class="option-title">바코드 스캔</div>
+                            <div class="option-desc">바코드를 스캔하여 정확한 제품 찾기</div>
+                        </div>
+                        <div class="option-arrow">›</div>
+                    </div>
+                </div>
+
+                <div class="contact-section">
+                    <div class="contact-text">찾는 제품이 없나요?</div>
+                    <a href="mailto:support@koko-app.com?subject=제품 문의" class="contact-link">
+                        <span>📧</span>
+                        <span>문의하기</span>
+                    </a>
+                </div>
             </div>
-            <button class="search-fab" onclick="toggleFabOptions()">🔍</button>
         </div>
 
         <!-- 하단 네비게이션 -->
@@ -1622,8 +1757,8 @@
         <div class="toast" id="toast"></div>
     </div>
 
-    <!-- QuaggaJS 바코드 스캔 라이브러리 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <!-- ZXing barcode scanning library -->
+    <script src="https://unpkg.com/@zxing/browser@latest"></script>
     
     <script>
         // 전역 변수
@@ -1632,6 +1767,23 @@
         let likedProducts = new Set();
         let currentProduct = null;
         let isScanning = false;
+
+        // ZXing 설정
+        const { BrowserMultiFormatReader, BarcodeFormat, NotFoundException } = ZXingBrowser;
+        const READER = new BrowserMultiFormatReader();
+        const POSSIBLE_FORMATS = [
+            // 1D
+            BarcodeFormat.EAN_13, BarcodeFormat.EAN_8,
+            BarcodeFormat.UPC_A,  BarcodeFormat.UPC_E,
+            BarcodeFormat.CODE_128, BarcodeFormat.CODE_39,
+            BarcodeFormat.ITF, BarcodeFormat.CODABAR,
+            // 2D
+            BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX,
+            BarcodeFormat.PDF_417, BarcodeFormat.AZTEC
+        ];
+        const CONSENSUS = 3;
+        let lastDetections = [];
+        let scanLocked = false;
 
         // 다국어 지원
         const translations = {
@@ -2231,9 +2383,13 @@
             count.textContent = `도움이 됨 (${currentCount + 1})`;
         }
 
-        // 플로팅 검색 버튼 토글
-        function toggleFabOptions() {
-            document.getElementById('fabOptions').classList.toggle('show');
+        // 검색 옵션 모달 열기/닫기
+        function openSearchModal() {
+            document.getElementById('searchModal').classList.add('active');
+        }
+
+        function closeSearchModal() {
+            document.getElementById('searchModal').classList.remove('active');
         }
 
         // 이미지로 검색 (실시간 카메라 인식 예정)
@@ -2241,7 +2397,7 @@
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
-            toggleFabOptions();
+            closeSearchModal();
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
                     .then(stream => {
@@ -2261,84 +2417,81 @@
             if (navigator.vibrate) {
                 navigator.vibrate(30);
             }
-            toggleFabOptions();
+            closeSearchModal();
             document.getElementById('barcodeModal').classList.add('active');
             startScanning();
         }
 
-        // 바코드 스캔 시작
-        function startScanning() {
+        function upcAToEan13(code) {
+            return code && code.length === 12 ? '0' + code : code;
+        }
+
+        function normalizeResult(text, format) {
+            if (format === 'UPC_A') return { text: upcAToEan13(text), format: 'EAN_13' };
+            return { text, format };
+        }
+
+        function resetConsensus() {
+            lastDetections = [];
+            scanLocked = false;
+        }
+
+        async function startScanning() {
             const scanResult = document.getElementById('scanResult');
             const viewport = document.getElementById('scanner-viewport');
-            
+
             scanResult.style.display = 'none';
             viewport.style.display = 'block';
-            
-            if (!isScanning && typeof Quagga !== 'undefined') {
-                Quagga.init({
-                    inputStream: {
-                        type: "LiveStream",
-                        target: viewport,
-                        constraints: {
-                            width: 640,
-                            height: 480,
-                            facingMode: "environment" // 후면 카메라
+
+            resetConsensus();
+            try {
+                const devices = await READER.listVideoInputDevices();
+                const back = devices.find(d => /back|rear|environment/i.test(d.label))?.deviceId || devices[0]?.deviceId;
+
+                await READER.decodeFromVideoDevice(
+                    back,
+                    'barcodeVideo',
+                    (result, err, controls) => {
+                        if (scanLocked) return;
+                        if (result) {
+                            const rawText = result.getText();
+                            const format = BarcodeFormat[result.getBarcodeFormat()];
+                            const { text } = normalizeResult(rawText, format);
+
+                            lastDetections.push(text);
+                            const slice = lastDetections.slice(-CONSENSUS);
+                            const stable = slice.length === CONSENSUS && slice.every(v => v === slice[0]);
+                            if (stable) {
+                                scanLocked = true;
+                                controls.stop();
+                                if (navigator.vibrate) navigator.vibrate(100);
+                                showBarcodeResult(text);
+                            }
+                        } else if (err && !(err instanceof NotFoundException)) {
+                            console.warn(err);
                         }
                     },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: true
-                    },
-                    numOfWorkers: 2,
-                    decoder: {
-                        readers: [
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_128_reader",
-                            "code_39_reader",
-                            "upc_reader",
-                            "upc_e_reader"
-                        ]
-                    },
-                    locate: true
-                }, function(err) {
-                    if (err) {
-                        console.log(err);
-                        showToast('카메라를 사용할 수 없습니다');
-                        // 대체: 파일 업로드 방식
-                        fallbackToFileUpload();
-                        return;
+                    {
+                        hints: { POSSIBLE_FORMATS },
+                        videoConstraints: {
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        }
                     }
-                    console.log("바코드 스캐너 시작");
-                    Quagga.start();
-                    isScanning = true;
-                });
-
-                // 바코드 감지 시
-                Quagga.onDetected(function(result) {
-                    const code = result.codeResult.code;
-                    console.log("바코드 감지:", code);
-                    
-                    // 진동 피드백
-                    if (navigator.vibrate) {
-                        navigator.vibrate(100);
-                    }
-                    
-                    // 스캔 중지
-                    stopScanning();
-                    
-                    // 결과 표시
-                    showBarcodeResult(code);
-                });
+                );
+                isScanning = true;
+            } catch (err) {
+                console.log(err);
+                showToast('카메라를 사용할 수 없습니다');
+                fallbackToFileUpload();
             }
         }
 
-        // 스캔 중지
         function stopScanning() {
-            if (isScanning && typeof Quagga !== 'undefined') {
-                Quagga.stop();
-                isScanning = false;
-            }
+            READER.reset();
+            resetConsensus();
+            isScanning = false;
         }
 
         // 스캐너 닫기
@@ -2435,39 +2588,27 @@
             input.type = 'file';
             input.accept = 'image/*';
             input.capture = 'environment';
-            
+
             input.onchange = function(e) {
                 const file = e.target.files[0];
                 if (file) {
-                    // 이미지에서 바코드 읽기
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        decodeImageBarcode(e.target.result);
-                    };
-                    reader.readAsDataURL(file);
+                    const url = URL.createObjectURL(file);
+                    decodeImageBarcode(url).finally(() => URL.revokeObjectURL(url));
                 }
             };
-            
+
             input.click();
         }
 
-        // 이미지에서 바코드 디코딩
         function decodeImageBarcode(imageSrc) {
-            if (typeof Quagga !== 'undefined') {
-                Quagga.decodeSingle({
-                    src: imageSrc,
-                    numOfWorkers: 0,
-                    decoder: {
-                        readers: ["ean_reader", "ean_8_reader", "code_128_reader"]
-                    }
-                }, function(result) {
-                    if (result && result.codeResult) {
-                        showBarcodeResult(result.codeResult.code);
-                    } else {
-                        showToast('바코드를 인식할 수 없습니다');
-                    }
-                });
-            }
+            return READER.decodeFromImageUrl(imageSrc)
+                .then(result => {
+                    const rawText = result.getText();
+                    const format = BarcodeFormat[result.getBarcodeFormat()];
+                    const { text } = normalizeResult(rawText, format);
+                    showBarcodeResult(text);
+                })
+                .catch(() => showToast('바코드를 인식할 수 없습니다'));
         }
 
         // 바코드 모달 외부 클릭 시 닫기
