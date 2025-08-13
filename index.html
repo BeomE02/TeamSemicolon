@@ -1766,6 +1766,9 @@
         let likedProducts = new Set();
         let currentProduct = null;
         let isScanning = false;
+        let scanLocked = false;
+        let detectionHistory = [];
+        const STABLE_COUNT = 3;
 
         // 다국어 지원
         const translations = {
@@ -2404,40 +2407,75 @@
             startScanning();
         }
 
+        function normalizeEAN13(str) {
+            const digits = (str || '').replace(/\D/g, '');
+            return digits.length >= 13 ? digits.slice(0, 13) : null;
+        }
+
+        function isValidEAN13(code) {
+            if (!/^\d{13}$/.test(code)) return false;
+            let sum = 0;
+            for (let i = 0; i < 12; i++) {
+                sum += parseInt(code[i], 10) * (i % 2 ? 3 : 1);
+            }
+            return (10 - (sum % 10)) % 10 === parseInt(code[12], 10);
+        }
+
+        function onDetected(res) {
+            if (scanLocked) return;
+            const raw = res.codeResult?.code;
+            const ean = normalizeEAN13(raw);
+            if (!ean || !isValidEAN13(ean)) return;
+
+            detectionHistory.push(ean);
+            const recent = detectionHistory.slice(-STABLE_COUNT);
+            const stable = recent.length === STABLE_COUNT && recent.every(v => v === recent[0]);
+            if (!stable) return;
+
+            scanLocked = true;
+            if (typeof Quagga.offDetected === 'function') {
+                Quagga.offDetected(onDetected);
+            }
+            // 진동 피드백
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+            stopScanning();
+            showBarcodeResult(ean);
+        }
+
         // 바코드 스캔 시작
         function startScanning() {
             const scanResult = document.getElementById('scanResult');
             const viewport = document.getElementById('scanner-viewport');
-            
+
             scanResult.style.display = 'none';
             viewport.style.display = 'block';
-            
+
             if (!isScanning && typeof Quagga !== 'undefined') {
+                // 이전 핸들러 및 상태 초기화
+                if (typeof Quagga.offDetected === 'function') {
+                    Quagga.offDetected(onDetected);
+                }
+                scanLocked = false;
+                detectionHistory = [];
+
                 Quagga.init({
                     inputStream: {
+                        name: "Live",
                         type: "LiveStream",
                         target: viewport,
                         constraints: {
-                            width: 640,
-                            height: 480,
-                            facingMode: "environment" // 후면 카메라
-                        }
+                            facingMode: "environment",
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            focusMode: "continuous"
+                        },
+                        area: { top: "15%", right: "15%", left: "15%", bottom: "15%" }
                     },
-                    locator: {
-                        patchSize: "medium",
-                        halfSample: true
-                    },
-                    numOfWorkers: 2,
-                    decoder: {
-                        readers: [
-                            "ean_reader",
-                            "ean_8_reader",
-                            "code_128_reader",
-                            "code_39_reader",
-                            "upc_reader",
-                            "upc_e_reader"
-                        ]
-                    },
+                    locator: { patchSize: "medium", halfSample: true },
+                    numOfWorkers: navigator.hardwareConcurrency || 4,
+                    decoder: { readers: ["ean_reader"], multiple: false },
                     locate: true
                 }, function(err) {
                     if (err) {
@@ -2450,23 +2488,7 @@
                     console.log("바코드 스캐너 시작");
                     Quagga.start();
                     isScanning = true;
-                });
-
-                // 바코드 감지 시
-                Quagga.onDetected(function(result) {
-                    const code = result.codeResult.code;
-                    console.log("바코드 감지:", code);
-                    
-                    // 진동 피드백
-                    if (navigator.vibrate) {
-                        navigator.vibrate(100);
-                    }
-                    
-                    // 스캔 중지
-                    stopScanning();
-                    
-                    // 결과 표시
-                    showBarcodeResult(code);
+                    Quagga.onDetected(onDetected);
                 });
             }
         }
@@ -2476,6 +2498,9 @@
             if (isScanning && typeof Quagga !== 'undefined') {
                 Quagga.stop();
                 isScanning = false;
+                if (typeof Quagga.offDetected === 'function') {
+                    Quagga.offDetected(onDetected);
+                }
             }
         }
 
