@@ -1476,6 +1476,7 @@
                             <span>🔔</span>
                             <span class="notification-badge"></span>
                         </button>
+                        <button class="icon-btn" id="authBtn" onclick="toggleAuth()">🔑</button>
                     </div>
                 </div>
                 <div class="search-container">
@@ -1862,7 +1863,7 @@
         };
 
         // 제품 데이터
-        const products = [
+        var products = [
             {
                 id: 1,
                 name: { ko: '신라면', en: 'Shin Ramyun', ja: '辛ラーメン' },
@@ -1974,7 +1975,7 @@
         ];
 
         // 리뷰 데이터
-        const reviews = [
+        var reviews = [
             {
                 id: 1,
                 productId: 1,
@@ -2011,7 +2012,7 @@
         ];
 
         // 초기화
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // 스플래시 스크린 페이드아웃
             setTimeout(() => {
                 document.getElementById('splash').classList.add('fade-out');
@@ -2020,7 +2021,10 @@
                 }, 500);
             }, 2000);
 
-            // 제품 목록 렌더링
+            // Firestore에서 데이터 로드 후 렌더링
+            if (window.loadData) {
+                await window.loadData();
+            }
             renderProducts();
             updateFavCount();
         });
@@ -2925,16 +2929,11 @@
         // 앱 초기화 완료
         console.log('KOKO App initialized successfully');
     </script>
-</body>
 <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
     apiKey: "AIzaSyAGGhhvXrt_sPkEDp360tfOLX6vwyLjezw",
     authDomain: "semicolon-15de8.firebaseapp.com",
@@ -2945,8 +2944,52 @@
     measurementId: "G-18G940NB57"
   };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    async function loadData() {
+    const productsCol = collection(db, 'products');
+    const snapshot = await getDocs(productsCol);
+    if (snapshot.empty) {
+      for (const p of products) {
+        const { id, ...data } = p;
+        await setDoc(doc(productsCol, id.toString()), data);
+        const productReviews = reviews.filter(r => r.productId === id);
+        for (const r of productReviews) {
+          const { id: rid, productId, ...reviewData } = r;
+          await addDoc(collection(db, `products/${id}/reviews`), reviewData);
+        }
+      }
+    } else {
+      products = snapshot.docs.map(d => ({ id: Number(d.id), ...d.data() }));
+      reviews = [];
+      for (const prodDoc of snapshot.docs) {
+        const revSnapshot = await getDocs(collection(db, `products/${prodDoc.id}/reviews`));
+        revSnapshot.forEach(rv => reviews.push({ productId: Number(prodDoc.id), ...rv.data() }));
+      }
+    }
+    }
+
+    window.loadData = loadData;
+
+    async function toggleAuth() {
+      if (auth.currentUser) {
+        await signOut(auth);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
+    }
+
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('authBtn');
+      if (btn) {
+        btn.textContent = user ? '🚪' : '🔑';
+      }
+    });
+
+    window.toggleAuth = toggleAuth;
+  </script>
+</body>
 </html>
