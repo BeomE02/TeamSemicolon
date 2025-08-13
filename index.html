@@ -1476,6 +1476,7 @@
                             <span>🔔</span>
                             <span class="notification-badge"></span>
                         </button>
+                        <button class="icon-btn" id="authBtn" onclick="toggleAuth()">🔑</button>
                     </div>
                 </div>
                 <div class="search-container">
@@ -2928,11 +2929,10 @@
         // 앱 초기화 완료
         console.log('KOKO App initialized successfully');
     </script>
-</body>
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-  import { getFirestore, collection, getDocs, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, doc, setDoc, addDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAGGhhvXrt_sPkEDp360tfOLX6vwyLjezw",
@@ -2944,11 +2944,12 @@
     measurementId: "G-18G940NB57"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
 
-  async function loadData() {
+    async function loadData() {
     const productsCol = collection(db, 'products');
     const snapshot = await getDocs(productsCol);
     if (snapshot.empty) {
@@ -2969,8 +2970,26 @@
         revSnapshot.forEach(rv => reviews.push({ productId: Number(prodDoc.id), ...rv.data() }));
       }
     }
-  }
+    }
 
-  window.loadData = loadData;
-</script>
+    window.loadData = loadData;
+
+    async function toggleAuth() {
+      if (auth.currentUser) {
+        await signOut(auth);
+      } else {
+        await signInWithPopup(auth, provider);
+      }
+    }
+
+    onAuthStateChanged(auth, user => {
+      const btn = document.getElementById('authBtn');
+      if (btn) {
+        btn.textContent = user ? '🚪' : '🔑';
+      }
+    });
+
+    window.toggleAuth = toggleAuth;
+  </script>
+</body>
 </html>
