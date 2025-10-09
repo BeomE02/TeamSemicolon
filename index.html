@@ -116,6 +116,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script>
+        // --- API & 설정 ---
         const FOOD_API_KEY = 'c320de96f22d4183bd13';
         const TRANSLATE_API_KEY = 'AIzaSyArr1P7f6JuAL8Xz8ECiHi8WkfbNRn4Z7I';
         const GEMINI_API_KEY = 'AIzaSyDrsbT0bzRyi1WOA3byzJI8VOIY2NpYa6Y';
@@ -172,7 +173,7 @@
                 clearTimeout(searchTimeout);
                 const query = searchInput.value.trim();
                 if (query.length > 0) {
-                    searchTimeout = setTimeout(performSearch, 500); // 1000ms -> 500ms로 단축
+                    searchTimeout = setTimeout(performSearch, 500);
                 }
             });
         
@@ -311,7 +312,7 @@
             const results = searchCache.filter(p =>
                 (p[productNameKey]?.toLowerCase().includes(lowerCaseQuery)) ||
                 (p[companyNameKey]?.toLowerCase().includes(lowerCaseQuery))
-            ).slice(0, 15); // 30개 -> 15개로 축소
+            ).slice(0, 15);
         
             if (results.length === 0) {
                 container.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('gemini_searching')}</div>`;
@@ -345,15 +346,13 @@
             }
         }
         
-        // 캐시 확인 추가
         async function searchWithGeminiForList(query) {
-            // 캐시 확인
             const cacheKey = `${query}_${currentLang}`;
             if (cache.geminiLists[cacheKey]) {
                 return cache.geminiLists[cacheKey];
             }
         
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
             const prompt = `이제 검색엔진처럼 작동해봐. 예를들어 내가 진라면을 검색하면 너는 진라면 매운맛, 진라면 순한맛, 진라면 중간맛 등등 처럼 검색어 연관순으로 대답을 하는거야.이제 내가 '${query}'(으)로 검색하면 상품의 이름과 제조사를 '제품명 | 제조사' 형식으로 알려줘. 다른 설명, 숫자, 기호 없이, 한 줄에 하나씩만 나열해줘.`;
             try {
                 const response = await fetch(GEMINI_URL, { 
@@ -376,7 +375,6 @@
                     return parts.length === 2 ? { name: parts[0], manufacturer: parts[1] } : null;
                 }).filter(item => item && item.name);
                 
-                // 캐시 저장
                 cache.geminiLists[cacheKey] = result;
                 return result;
             } catch (error) {
@@ -393,16 +391,24 @@
             const cleanName = productName.replace(/&quot;/g, '"');
         
             try {
-                const [details, imageURL] = await Promise.allSettled([
-                    getCachedGeminiProductDetails(cleanName),
-                    getCachedProductImageURL(cleanName)
-                ]);
+                const cacheKey = `${cleanName}_ko`;
+                let details = cache.details[cacheKey];
+                let imageURL = cache.images[cleanName];
         
-                const detailsValue = details.status === 'fulfilled' ? details.value : null;
-                const imageValue = imageURL.status === 'fulfilled' ? imageURL.value : null;
+                if (!details || !imageURL) {
+                    const results = await Promise.all([
+                        details ? Promise.resolve(details) : getGeminiProductDetails(cleanName),
+                        imageURL ? Promise.resolve(imageURL) : getProductImageURL(cleanName)
+                    ]);
+                    details = results[0];
+                    imageURL = results[1];
+                    
+                    if (details) cache.details[cacheKey] = details;
+                    if (imageURL) cache.images[cleanName] = imageURL;
+                }
         
-                if (detailsValue) {
-                    showProductDetail(detailsValue, imageValue);
+                if (details) {
+                    showProductDetail(details, imageURL);
                 } else {
                     throw new Error(getText('errorLoading'));
                 }
@@ -411,28 +417,8 @@
             }
         }
         
-        // 캐시 적용 함수
-        async function getCachedGeminiProductDetails(productName) {
-            const cacheKey = `${productName}_ko`;
-            if (cache.details[cacheKey]) {
-                return cache.details[cacheKey];
-            }
-            const details = await getGeminiProductDetails(productName);
-            cache.details[cacheKey] = details;
-            return details;
-        }
-        
-        async function getCachedProductImageURL(productName) {
-            if (cache.images[productName]) {
-                return cache.images[productName];
-            }
-            const imageURL = await getProductImageURL(productName);
-            cache.images[productName] = imageURL;
-            return imageURL;
-        }
-        
         async function getGeminiProductDetails(productName) {
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
             const prompt = `'${productName}'(이)라는 한국 상품에 대해 구매자가 궁금해할 만한 상세 정보를 알려줘. 항상 **제조사, 제품 카테고리, 바코드 번호**는 포함해줘. 만약 식품이라면 **칼로리, 영양성분(탄수화물, 단백질, 지방), 전체 성분, 알레르기 정보, 비건 여부**를 추가하고, 화장품이라면 **제품 유형(토너, 앰플 등), 주요 성분, 비건 여부**를 추가해줘. 정보가 없거나 해당 없는 항목은 제외하고, "항목: 값" 형식으로만 나열해줘.`;
             try {
                 const response = await fetch(GEMINI_URL, { 
@@ -485,6 +471,7 @@
             if (!productData) { goBack(); return; }
             showPage('detail');
             const content = document.getElementById('detailPageContent');
+            content.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('loadingInfo')}</div>`;
             
             let pName = productData['상품명'] || '';
             let pCompany = productData['제조사'] || '-';
@@ -498,7 +485,7 @@
             let finalInfoItems = infoItems;
         
             if (currentLang !== 'ko' && (title || subtitle || Object.keys(finalInfoItems).length > 0)) {
-                content.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('translating')}</div>`;
+                showToast(getText('translating'));
                 const keys = Object.keys(finalInfoItems);
                 const values = Object.values(finalInfoItems);
                 const [translatedTitle, translatedSubtitle, translatedKeys, translatedValues] = await Promise.all([
@@ -660,20 +647,10 @@
         }
         
         async function getProductNameFromBarcode(barcode) {
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
             const prompt = `한국 상품 바코드 번호가 '${barcode}'일 때, 이 상품의 가장 정확한 전체 제품 이름(브랜드 포함) 하나만 알려줘. 다른 설명은 모두 제외하고 오직 제품 이름만 응답해줘.`;
             try {
-                const response = await fetch(GEMINI_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        "contents": [{ "parts": [{ "text": prompt }] }],
-                        "generationConfig": {
-                            "temperature": 0.2,
-                            "maxOutputTokens": 100
-                        }
-                    }) 
-                });
+                const response = await fetch(GEMINI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }] }) });
                 if (!response.ok) return null;
                 const data = await response.json();
                 if (!data.candidates || !data.candidates[0].content.parts[0].text) return null;
