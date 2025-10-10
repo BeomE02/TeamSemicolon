@@ -412,25 +412,23 @@
             flex-direction: column; /* 세로로 정렬 */
             align-items: center;   /* 가운데 정렬 */
         }
+        /* [수정] .splash-title span과 .splash-subtitle span을 그룹으로 묶어 동일한 스타일 적용 */
+        .splash-title span,
+        .splash-subtitle span {
+            opacity: 0.2;
+            animation: letterBlink 2s infinite;
+        }
         
-        /* [추가] 부제('TeamSemicolon') 스타일 */
+        /* [수정] .splash-subtitle에서 애니메이션 속성을 제거하고, 글자(span)들을 담을 컨테이너로 설정 */
         .splash-subtitle {
-            font-size: 2rem;
-            font-weight: 500;       /* [수정] HANNUN과 동일하게 500으로 변경 */
+            display: flex; /* JavaScript로 추가될 span들을 가로로 나열하기 위해 필요 */
+            font-size: 0.8rem;
+            font-weight: 500;
             color: var(--primary-white);
             margin-top: 0.75rem;
-            letter-spacing: -0.02em;  /* [수정] HANNUN과 동일하게 -0.02em으로 변경 */
-            
-            opacity: 0;
-            animation: subtitleFadeIn 1.2s ease-out 0.6s forwards;
+            letter-spacing: -0.02em;
         }
         
-        /* [추가] 부제를 위한 애니메이션 키프레임 */
-        @keyframes subtitleFadeIn {
-            to {
-                opacity: 0.7; /* 메인 로고보다 약간 흐리게 설정 */
-            }
-        }
     </style>
 </head>
 
@@ -651,7 +649,18 @@
             });
         
             // 'TeamSemicolon' 부제 애니메이션
-            document.getElementById('splashSubtitle').textContent = "TeamSemicolon";
+            const splashSubtitle = document.getElementById('splashSubtitle');
+            const subtitleText = "TeamSemicolon";
+            const baseDelay = 0.4; // 'HANNUN'보다 0.4초 늦게 시작
+            
+            // "TeamSemicolon"을 한 글자씩 쪼개서 span으로 만들고, 순차적으로 딜레이 적용
+            subtitleText.split('').forEach((letter, i) => {
+                const span = document.createElement('span');
+                span.textContent = letter;
+                // 기본 딜레이(0.4s)에 순차적인 딜레이(0.1s)를 더함
+                span.style.animationDelay = `${baseDelay + (i * 0.1)}s`;
+                splashSubtitle.appendChild(span);
+            });
         
             // 스플래시 화면이 사라지는 시간 설정 (애니메이션이 충분히 보일 수 있도록 2.5초로 조정)
             setTimeout(() => {
