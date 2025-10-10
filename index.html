@@ -77,23 +77,315 @@
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .no-results { text-align: center; padding: 4rem 1.5rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
         @media (max-width: 600px) { input[type="text"], input[type="number"] { font-size: 16px; } }
+        .detail-text-content { 
+            padding: 2rem 1.5rem; 
+            background: var(--primary-white); 
+            text-align: left;
+        }
+        
+        .detail-title { 
+            font-size: 2.2rem; 
+            font-weight: 800; 
+            letter-spacing: -0.03em; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        .detail-subtitle { 
+            font-size: 1rem; 
+            color: var(--accent-gray); 
+            margin-bottom: 0; 
+            font-weight: 500; 
+        }
+        
+        .info-grid { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 0; 
+            margin: 1.5rem 0; 
+            border-top: 1px solid var(--border-color); 
+        }
+        
+        .info-item { 
+            background: transparent; 
+            padding: 0.9rem 0.25rem; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .info-label { 
+            font-size: 0.9rem; 
+            color: var(--accent-gray); 
+            font-weight: 500; 
+            flex-shrink: 0; 
+            padding-right: 1rem; 
+        }
+        
+        .info-value { 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            text-align: right; 
+            color: var(--primary-black); 
+            word-break: break-all; 
+            width: 40%; 
+        }
+        
+        .scanner-modal { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0, 0, 0, 0.85); 
+            z-index: 3000; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1rem; 
+        }
+        
+        .scanner-modal.active { 
+            display: flex; 
+        }
+        
+        .barcode-modal-content { 
+            background: var(--primary-white); 
+            border-radius: 0; 
+            width: 100%; 
+            max-width: 500px; 
+            margin: 0 auto; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            border: 2px solid var(--primary-black); 
+            box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .barcode-header { 
+            background: var(--primary-black); 
+            padding: 1rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            color: var(--primary-white); 
+        }
+        
+        .close-scan-btn { 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 0; 
+            background: rgba(255, 255, 255, 0.2); 
+            border: none; 
+            color: var(--primary-white); 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .scan-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            flex: 1; 
+            text-align: center; 
+            margin-right: 2.25rem; 
+        }
+        
+        .scanner-container { 
+            position: relative; 
+            background: #000; 
+            height: 280px; 
+            overflow: hidden; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        #scanner-viewport, 
+        #scanner-viewport video, 
+        #scanner-viewport canvas { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+        }
+        
+        #ai-scanner-viewport { 
+            width: 100%; 
+            height: 100%; 
+            position: relative; 
+        }
+        
+        #ai-scanner-video { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+        }
+        
+        .scan-overlay { 
+            position: absolute; 
+            inset: 0; 
+            pointer-events: none; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        
+        .scan-guide { 
+            width: 70%; 
+            max-width: 300px; 
+            height: 120px; 
+            position: relative; 
+            border: 2px solid #00FF00; 
+        }
+        
+        .scan-line { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 2px; 
+            background: #00FF00; 
+            animation: scan 2s cubic-bezier(0.5, 0, 0.5, 1) infinite; 
+            box-shadow: 0 0 8px #00FF00; 
+        }
+        
+        @keyframes scan { 
+            0% { transform: translateY(0); } 
+            100% { transform: translateY(118px); } 
+        }
+        
+        .ai-detection-info { 
+            position: absolute; 
+            bottom: 1rem; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0, 0, 0, 0.8); 
+            color: white; 
+            padding: 0.5rem 1rem; 
+            border-radius: 4px; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+        }
+        
+        .manual-input { 
+            padding: 1.5rem; 
+            background: var(--light-gray); 
+            border-top: 1px solid var(--border-color); 
+        }
+        
+        .barcode-input { 
+            width: 100%; 
+            padding: 0.8rem 1rem; 
+            border: 2px solid var(--primary-black); 
+            border-radius: 0; 
+            font-size: 1rem; 
+            text-align: center; 
+            margin-bottom: 0.8rem; 
+            outline: none; 
+            background-color: var(--primary-white); 
+            transition: all 0.2s ease-out; 
+            box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); 
+        }
+        
+        .search-barcode-btn { 
+            width: 100%; 
+            padding: 0.9rem; 
+            background: var(--primary-black); 
+            color: var(--primary-white); 
+            border: 2px solid var(--primary-black); 
+            border-radius: 0; 
+            font-size: 0.9rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s ease-out; 
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .loading { 
+            text-align: center; 
+            padding: 3rem; 
+            color: var(--accent-gray); 
+            font-weight: 500; 
+            font-size: 1rem; 
+        }
+        
+        .spinner { 
+            width: 36px; 
+            height: 36px; 
+            border: 3px solid var(--border-color); 
+            border-top-color: var(--primary-black); 
+            border-radius: 50%; 
+            animation: spin 0.8s linear infinite; 
+            margin: 0 auto 1rem; 
+        }
+        
+        @keyframes spin { 
+            to { transform: rotate(360deg); } 
+        }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 2.5rem; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(100px); 
+            background: var(--primary-black); 
+            color: var(--primary-white); 
+            padding: 0.8rem 1.2rem; 
+            border-radius: 0; 
+            font-size: 0.9rem; 
+            z-index: 5000; 
+            opacity: 0; 
+            transition: all 0.3s ease-out; 
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2); 
+        }
+        
+        .toast.show { 
+            transform: translateX(-50%) translateY(0); 
+            opacity: 1; 
+        }
+        
+        .no-results { 
+            text-align: center; 
+            padding: 4rem 1.5rem; 
+            color: var(--accent-gray); 
+            font-weight: 500; 
+            font-size: 1rem; 
+        }
+        
+        @media (max-width: 600px) { 
+            input[type="text"], 
+            input[type="number"] { 
+                font-size: 16px; 
+            } 
+        }
     </style>
 </head>
 
 <body>
-    <div class="splash-screen" id="splash"> <div class="splash-title">HANNUN</div> </div>
+    <div class="splash-screen" id="splash"> 
+        <div class="splash-title">HANNUN</div> 
+    </div>
+    
     <main class="home-screen" id="home"> 
         <header class="header"> 
             <div class="logo"> 
                 <img src="logo.jpeg" alt="HANNUN Logo" class="logo-image">
             </div> 
-            <button class="lang-btn" onclick="toggleLanguage()"> <span id="langFlag">🇰🇷</span> <span id="langCode">KO</span> </button> 
+            <button class="lang-btn" onclick="toggleLanguage()"> 
+                <span id="langFlag">🇰🇷</span> 
+                <span id="langCode">KO</span> 
+            </button> 
         </header> 
+        
         <div class="main-content"> 
             <div class="welcome-text"> 
                 <h1 id="appTitle">한국 제품을<br>쉽게 찾아보세요</h1> 
                 <p id="appSubtitle">검색 방법을 선택하세요</p> 
             </div> 
+            
             <div class="search-options"> 
                 <div class="search-option" onclick="showPage('searchResults')"> 
                     <div class="option-icon"> 
@@ -106,6 +398,7 @@
                         <p class="option-desc" id="searchByNameDesc">이름이나 브랜드로 제품 찾기</p> 
                     </div> 
                 </div> 
+                
                 <div class="search-option" onclick="openBarcodeScanner()"> 
                     <div class="option-icon"> 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"> 
@@ -117,6 +410,7 @@
                         <p class="option-desc" id="scanBarcodeDesc">바코드로 정확하게 제품 찾기</p> 
                     </div> 
                 </div>
+                
                 <div class="search-option" onclick="openImageSearch()">
                     <div class="option-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -133,6 +427,7 @@
         </div> 
     </main>
 
+    <!-- 검색 결과 페이지 -->
     <div class="page-slide-right" id="searchResults"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -148,6 +443,7 @@
         <div class="results-container" id="resultsContainer"></div> 
     </div>
 
+    <!-- 상세 정보 페이지 -->
     <div class="page-slide-right" id="detail"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -158,6 +454,7 @@
         <div id="detailPageContent"></div> 
     </div>
 
+    <!-- 바코드 스캐너 모달 -->
     <div class="scanner-modal" id="scannerModal"> 
         <div class="barcode-modal-content"> 
             <div class="barcode-header"> 
@@ -179,6 +476,7 @@
         </div> 
     </div>
 
+    <!-- AI 실시간 인식 모달 -->
     <div class="scanner-modal" id="aiScannerModal">
         <div class="barcode-modal-content">
             <div class="barcode-header">
@@ -199,6 +497,7 @@
         </div>
     </div>
 
+    <!-- 토스트 알림 -->
     <div class="toast" id="toast"></div>
 
 
