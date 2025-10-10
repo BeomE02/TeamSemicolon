@@ -651,13 +651,7 @@
             });
         
             // 'TeamSemicolon' 부제 애니메이션
-            const splashSubtitle = document.getElementById('splashSubtitle');
-            const subtitleText = "TeamSemicolon";
-            subtitleText.split('').forEach(letter => {
-                const span = document.createElement('span');
-                span.textContent = letter;
-                splashSubtitle.appendChild(span);
-            });
+            document.getElementById('splashSubtitle').textContent = "TeamSemicolon";
         
             // 스플래시 화면이 사라지는 시간 설정 (애니메이션이 충분히 보일 수 있도록 2.5초로 조정)
             setTimeout(() => {
