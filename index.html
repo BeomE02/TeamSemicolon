@@ -204,8 +204,16 @@
             geminiLists: {}
         };
         
-        // --- AI 모델 클래스 이름 (바코드 번호) ---
-        const CLASS_NAMES = ['8801115112117', '8801115111018']; // coffee, milk
+        // --- AI 모델 클래스 이름 ---
+        const CLASS_NAMES = ['delos_red', 'delos_blue', 'tissue_ryan', 'tissue_crocodile'];
+        
+        // 한글 이름 매핑
+        const KOREAN_NAMES = {
+            'delos_red': '델로스 빨간색',
+            'delos_blue': '델로스 파란색', 
+            'tissue_ryan': '각티슈 라이언',
+            'tissue_crocodile': '각티슈 악어'
+        };
         
         // --- 다국어 텍스트 ---
         const translations = {
@@ -326,31 +334,33 @@
         
         async function captureAndRecognize(video) {
             const canvas = document.createElement('canvas');
-            canvas.width = 640;
-            canvas.height = 640;
+            canvas.width = 224; // ← 224로 변경
+            canvas.height = 224;
             const ctx = canvas.getContext('2d');
             
             // 비디오 프레임을 캔버스에 그리기
-            const scale = Math.min(640 / video.videoWidth, 640 / video.videoHeight);
-            const x = (640 - video.videoWidth * scale) / 2;
-            const y = (640 - video.videoHeight * scale) / 2;
+            const scale = Math.min(224 / video.videoWidth, 224 / video.videoHeight);
+            const x = (224 - video.videoWidth * scale) / 2;
+            const y = (224 - video.videoHeight * scale) / 2;
             
             ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, 640, 640);
+            ctx.fillRect(0, 0, 224, 224);
             ctx.drawImage(video, x, y, video.videoWidth * scale, video.videoHeight * scale);
             
             // 캔버스를 Blob으로 변환
             canvas.toBlob(async (blob) => {
                 try {
-                    const barcode = await recognizeProductFromImage(blob);
+                    const productClass = await recognizeProductFromImage(blob);
                     
-                    if (barcode && barcode !== lastDetectedBarcode) {
-                        lastDetectedBarcode = barcode;
+                    if (productClass && productClass !== lastDetectedBarcode) {
+                        lastDetectedBarcode = productClass;
                         detectionCooldown = true;
+                        
+                        const koreanName = KOREAN_NAMES[productClass] || productClass;
                         
                         // 감지 정보 표시
                         const infoEl = document.getElementById('aiDetectionInfo');
-                        infoEl.textContent = `✅ 인식됨: ${barcode}`;
+                        infoEl.textContent = `✅ 인식됨: ${koreanName}`;
                         infoEl.style.display = 'block';
                         infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
                         
@@ -359,9 +369,10 @@
                         // 2초 후 자동으로 상세 페이지로 이동
                         setTimeout(async () => {
                             closeAIScanner();
-                            await findProductByBarcode(barcode);
+                            // 제품명으로 검색
+                            await getDetailsAndShow(koreanName);
                         }, 2000);
-                    } else if (!barcode) {
+                    } else if (!productClass) {
                         // 인식 못함 표시
                         const infoEl = document.getElementById('aiDetectionInfo');
                         infoEl.textContent = '제품을 화면 중앙에 맞춰주세요';
@@ -401,126 +412,72 @@
             const feeds = { images: tensor };
             const results = await productModel.run(feeds);
             
-            // 🔍 디버그: 모델 출력 구조 확인
-            console.log('=== 모델 출력 디버그 ===');
-            console.log('출력 키:', Object.keys(results));
-            for (let key in results) {
-                const output = results[key];
-                console.log(`${key}:`, {
-                    shape: output.dims,
-                    dataType: output.type,
-                    dataLength: output.data.length,
-                    샘플데이터: Array.from(output.data.slice(0, 20))
-                });
-            }
-            console.log('=======================');
-            
-            // YOLO 출력 처리 (여러 형식 대응)
-            let output = results.output0 || results.output || results[Object.keys(results)[0]];
-            const dims = output.dims;
-            const data = output.data;
-            
-            console.log(`처리 중: shape=${dims}, length=${data.length}`);
-            
-            // 형식 1: [1, 6, 8400] - YOLOv8
-            if (dims.length === 3 && dims[1] >= 4) {
-                return processYOLOv8Output(data, dims);
-            }
-            // 형식 2: [1, 25200, 7] - 다른 YOLO 버전
-            else if (dims.length === 3 && dims[2] >= 5) {
-                return processYOLOAlternativeOutput(data, dims);
-            }
-            // 형식 3: [1, 2] - 분류 모델
-            else if (dims.length === 2) {
-                return processClassificationOutput(data);
-            }
-            
-            console.error('지원하지 않는 출력 형식:', dims);
-            return null;
-        }
-        
-        function processYOLOv8Output(data, dims) {
-            const numDetections = dims[2]; // 8400
-            const numClasses = CLASS_NAMES.length;
-            
-            let bestDetection = null;
-            let bestScore = 0.25; // 최소 신뢰도 25%
-            
-            for (let i = 0; i < numDetections; i++) {
-                for (let c = 0; c < numClasses; c++) {
-                    const score = data[i + (4 + c) * numDetections];
-                    
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestDetection = {
-                            classIndex: c,
-                            confidence: score,
-                            barcode: CLASS_NAMES[c]
-                        };
-                    }
+            // 🔍 디버그: 모델 출력 구조 확인 (처음 한 번만)
+            if (!window.modelDebugDone) {
+                console.log('=== 모델 출력 디버그 ===');
+                console.log('출력 키:', Object.keys(results));
+                for (let key in results) {
+                    const output = results[key];
+                    console.log(`${key}:`, {
+                        shape: output.dims,
+                        dataType: output.type,
+                        dataLength: output.data.length,
+                        샘플데이터: Array.from(output.data.slice(0, 20))
+                    });
                 }
+                console.log('=======================');
+                window.modelDebugDone = true;
             }
             
-            if (bestDetection) {
-                console.log(`✅ 감지됨: ${bestDetection.barcode} (신뢰도: ${(bestDetection.confidence * 100).toFixed(1)}%)`);
-                return bestDetection.barcode;
-            }
+            // 분류 모델 출력 처리
+            const output = results[Object.keys(results)[0]];
+            const predictions = output.data;
             
-            console.log('❌ 신뢰도 25% 이상인 객체 없음');
-            return null;
-        }
-        
-        function processYOLOAlternativeOutput(data, dims) {
-            const numDetections = dims[1];
-            const numValues = dims[2];
-            const numClasses = CLASS_NAMES.length;
-            
-            let bestDetection = null;
-            let bestScore = 0.25;
-            
-            for (let i = 0; i < numDetections; i++) {
-                const baseIdx = i * numValues;
-                
-                for (let c = 0; c < numClasses; c++) {
-                    const score = data[baseIdx + 5 + c];
-                    
-                    if (score > bestScore) {
-                        bestScore = score;
-                        bestDetection = {
-                            classIndex: c,
-                            confidence: score,
-                            barcode: CLASS_NAMES[c]
-                        };
-                    }
-                }
-            }
-            
-            if (bestDetection) {
-                console.log(`✅ 감지됨: ${bestDetection.barcode} (신뢰도: ${(bestDetection.confidence * 100).toFixed(1)}%)`);
-                return bestDetection.barcode;
-            }
-            
-            console.log('❌ 신뢰도 25% 이상인 객체 없음');
-            return null;
-        }
-        
-        function processClassificationOutput(data) {
+            // 가장 높은 확률의 클래스 찾기
             let maxIndex = 0;
-            let maxScore = data[0];
+            let maxScore = predictions[0];
             
-            for (let i = 1; i < data.length; i++) {
-                if (data[i] > maxScore) {
-                    maxScore = data[i];
+            for (let i = 1; i < CLASS_NAMES.length; i++) {
+                if (predictions[i] > maxScore) {
+                    maxScore = predictions[i];
                     maxIndex = i;
                 }
             }
             
-            if (maxScore > 0.3 && maxIndex < CLASS_NAMES.length) {
-                console.log(`✅ 분류됨: ${CLASS_NAMES[maxIndex]} (신뢰도: ${(maxScore * 100).toFixed(1)}%)`);
+            console.log('🎯 예측 결과:', {
+                클래스: CLASS_NAMES[maxIndex],
+                한글명: KOREAN_NAMES[CLASS_NAMES[maxIndex]],
+                신뢰도: `${(maxScore * 100).toFixed(1)}%`,
+                전체확률: Array.from(predictions).map((p, i) => `${CLASS_NAMES[i]}: ${(p * 100).toFixed(1)}%`)
+            });
+            
+            // 신뢰도 90% 이상일 때만 인식 (Python 코드와 동일)
+            if (maxScore >= 0.90) {
                 return CLASS_NAMES[maxIndex];
+            } else if (maxScore >= 0.50) {
+                console.log('⚠️ 신뢰도 부족:', `${(maxScore * 100).toFixed(1)}% (최소 90% 필요)`);
+            } else {
+                console.log('🔇 노이즈 감지 (무시됨)');
             }
             
-            console.log('❌ 신뢰도 30% 이상인 클래스 없음');
+            return null;
+        }
+        
+        function processYOLOv8Output(data, dims) {
+            // 더 이상 사용하지 않음 (분류 모델이므로)
+            console.warn('YOLO 모델이 아닙니다. 분류 모델을 사용하세요.');
+            return null;
+        }
+        
+        function processYOLOAlternativeOutput(data, dims) {
+            // 더 이상 사용하지 않음 (분류 모델이므로)
+            console.warn('YOLO 모델이 아닙니다. 분류 모델을 사용하세요.');
+            return null;
+        }
+        
+        function processClassificationOutput(data) {
+            // 더 이상 사용하지 않음 (메인 함수로 통합)
+            console.warn('processClassificationOutput은 더 이상 사용되지 않습니다.');
             return null;
         }
         
@@ -529,14 +486,16 @@
                 const img = new Image();
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const size = 640;
+                    const size = 224; // ← 224x224로 변경!
                     canvas.width = size;
                     canvas.height = size;
                     const ctx = canvas.getContext('2d');
                     
+                    // 검은 배경
                     ctx.fillStyle = '#000';
                     ctx.fillRect(0, 0, size, size);
                     
+                    // 이미지를 중앙에 맞춤 (비율 유지)
                     const scale = Math.min(size / img.width, size / img.height);
                     const x = (size - img.width * scale) / 2;
                     const y = (size - img.height * scale) / 2;
@@ -546,16 +505,25 @@
                     const imageData = ctx.getImageData(0, 0, size, size);
                     const float32Data = new Float32Array(3 * size * size);
                     
-                    for (let i = 0; i < size * size; i++) {
-                        float32Data[i] = imageData.data[i * 4] / 255.0;
-                        float32Data[size * size + i] = imageData.data[i * 4 + 1] / 255.0;
-                        float32Data[2 * size * size + i] = imageData.data[i * 4 + 2] / 255.0;
+                    // HWC → CHW 형식으로 변환
+                    for (let c = 0; c < 3; c++) {
+                        for (let h = 0; h < size; h++) {
+                            for (let w = 0; w < size; w++) {
+                                const idx = (h * size + w) * 4 + c;
+                                float32Data[c * size * size + h * size + w] = imageData.data[idx] / 255.0;
+                            }
+                        }
                     }
                     
                     const tensor = new ort.Tensor('float32', float32Data, [1, 3, size, size]);
                     resolve(tensor);
                 };
-                img.src = URL.createObjectURL(imageFile);
+                
+                if (imageFile instanceof Blob) {
+                    img.src = URL.createObjectURL(imageFile);
+                } else {
+                    img.src = URL.createObjectURL(imageFile);
+                }
             });
         }
         
