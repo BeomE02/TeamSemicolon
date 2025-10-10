@@ -372,6 +372,24 @@
                 font-size: 16px; 
             } 
         }
+
+        /* [추가] 메인 문구를 위한 애니메이션 적용 */
+        .welcome-text h1 {
+            opacity: 0; /* 애니메이션 시작 전에는 투명하게 */
+            animation: textFadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+        
+        /* [추가] 메인 문구를 위한 키프레임 정의 */
+        @keyframes textFadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
