@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -77,7 +76,6 @@
         .toast { position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary-black); color: var(--primary-white); padding: 0.8rem 1.2rem; border-radius: 0; font-size: 0.9rem; z-index: 5000; opacity: 0; transition: all 0.3s ease-out; box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2); }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .no-results { text-align: center; padding: 4rem 1.5rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
-        #imageInput { display: none; }
         @media (max-width: 600px) { input[type="text"], input[type="number"] { font-size: 16px; } }
     </style>
 </head>
@@ -127,13 +125,14 @@
                         </svg>
                     </div>
                     <div class="option-info">
-                        <h3 class="option-title" id="searchByImage">사진으로 검색</h3>
-                        <p class="option-desc" id="searchByImageDesc">제품 사진을 찍어서 찾기</p>
+                        <h3 class="option-title" id="searchByImage">AI 실시간 인식</h3>
+                        <p class="option-desc" id="searchByImageDesc">카메라로 제품을 비추면 자동 인식</p>
                     </div>
                 </div>
             </div> 
         </div> 
     </main>
+
     <div class="page-slide-right" id="searchResults"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -148,6 +147,7 @@
         </div> 
         <div class="results-container" id="resultsContainer"></div> 
     </div>
+
     <div class="page-slide-right" id="detail"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -157,6 +157,7 @@
         </div> 
         <div id="detailPageContent"></div> 
     </div>
+
     <div class="scanner-modal" id="scannerModal"> 
         <div class="barcode-modal-content"> 
             <div class="barcode-header"> 
@@ -177,8 +178,29 @@
             </div> 
         </div> 
     </div>
-    <input type="file" id="imageInput" accept="image/*" capture="environment">
+
+    <div class="scanner-modal" id="aiScannerModal">
+        <div class="barcode-modal-content">
+            <div class="barcode-header">
+                <h3 class="scan-title" id="aiScanTitle">AI 실시간 인식</h3>
+                <button class="close-scan-btn" onclick="closeAIScanner()">×</button>
+            </div>
+            <div class="scanner-container" id="ai-scanner-container">
+                <div id="ai-scanner-viewport">
+                    <video id="ai-scanner-video" autoplay playsinline></video>
+                </div>
+                <div class="scan-overlay">
+                    <div class="scan-guide">
+                        <div class="scan-line"></div>
+                    </div>
+                </div>
+                <div class="ai-detection-info" id="aiDetectionInfo" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
