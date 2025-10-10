@@ -180,7 +180,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
     <script>
-       // --- API & 설정 ---
+        // --- API & 설정 ---
         const FOOD_API_KEY = 'c320de96f22d4183bd13';
         const TRANSLATE_API_KEY = 'AIzaSyArr1P7f6JuAL8Xz8ECiHi8WkfbNRn4Z7I';
         const GEMINI_API_KEY = 'AIzaSyDrsbT0bzRyi1WOA3byzJI8VOIY2NpYa6Y';
@@ -302,9 +302,110 @@
             const feeds = { images: tensor };
             const results = await productModel.run(feeds);
             
-            const output = results[Object.keys(results)[0]];
+            // 🔍 디버그: 모델 출력 구조 확인
+            console.log('=== 모델 출력 디버그 ===');
+            console.log('출력 키:', Object.keys(results));
+            for (let key in results) {
+                const output = results[key];
+                console.log(`${key}:`, {
+                    shape: output.dims,
+                    dataType: output.type,
+                    dataLength: output.data.length,
+                    샘플데이터: Array.from(output.data.slice(0, 20))
+                });
+            }
+            console.log('=======================');
+            
+            // YOLO 출력 처리 (여러 형식 대응)
+            let output = results.output0 || results.output || results[Object.keys(results)[0]];
+            const dims = output.dims;
             const data = output.data;
             
+            console.log(`처리 중: shape=${dims}, length=${data.length}`);
+            
+            // 형식 1: [1, 6, 8400] - YOLOv8
+            if (dims.length === 3 && dims[1] >= 4) {
+                return processYOLOv8Output(data, dims);
+            }
+            // 형식 2: [1, 25200, 7] - 다른 YOLO 버전
+            else if (dims.length === 3 && dims[2] >= 5) {
+                return processYOLOAlternativeOutput(data, dims);
+            }
+            // 형식 3: [1, 2] - 분류 모델
+            else if (dims.length === 2) {
+                return processClassificationOutput(data);
+            }
+            
+            console.error('지원하지 않는 출력 형식:', dims);
+            return null;
+        }
+        
+        function processYOLOv8Output(data, dims) {
+            const numDetections = dims[2]; // 8400
+            const numClasses = CLASS_NAMES.length;
+            
+            let bestDetection = null;
+            let bestScore = 0.25; // 최소 신뢰도 25%
+            
+            for (let i = 0; i < numDetections; i++) {
+                for (let c = 0; c < numClasses; c++) {
+                    const score = data[i + (4 + c) * numDetections];
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestDetection = {
+                            classIndex: c,
+                            confidence: score,
+                            barcode: CLASS_NAMES[c]
+                        };
+                    }
+                }
+            }
+            
+            if (bestDetection) {
+                console.log(`✅ 감지됨: ${bestDetection.barcode} (신뢰도: ${(bestDetection.confidence * 100).toFixed(1)}%)`);
+                return bestDetection.barcode;
+            }
+            
+            console.log('❌ 신뢰도 25% 이상인 객체 없음');
+            return null;
+        }
+        
+        function processYOLOAlternativeOutput(data, dims) {
+            const numDetections = dims[1];
+            const numValues = dims[2];
+            const numClasses = CLASS_NAMES.length;
+            
+            let bestDetection = null;
+            let bestScore = 0.25;
+            
+            for (let i = 0; i < numDetections; i++) {
+                const baseIdx = i * numValues;
+                
+                for (let c = 0; c < numClasses; c++) {
+                    const score = data[baseIdx + 5 + c];
+                    
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestDetection = {
+                            classIndex: c,
+                            confidence: score,
+                            barcode: CLASS_NAMES[c]
+                        };
+                    }
+                }
+            }
+            
+            if (bestDetection) {
+                console.log(`✅ 감지됨: ${bestDetection.barcode} (신뢰도: ${(bestDetection.confidence * 100).toFixed(1)}%)`);
+                return bestDetection.barcode;
+            }
+            
+            console.log('❌ 신뢰도 25% 이상인 객체 없음');
+            return null;
+        }
+        
+        function processClassificationOutput(data) {
             let maxIndex = 0;
             let maxScore = data[0];
             
@@ -315,10 +416,12 @@
                 }
             }
             
-            if (maxScore > 0.5) {
+            if (maxScore > 0.3 && maxIndex < CLASS_NAMES.length) {
+                console.log(`✅ 분류됨: ${CLASS_NAMES[maxIndex]} (신뢰도: ${(maxScore * 100).toFixed(1)}%)`);
                 return CLASS_NAMES[maxIndex];
             }
             
+            console.log('❌ 신뢰도 30% 이상인 클래스 없음');
             return null;
         }
         
