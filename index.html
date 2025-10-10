@@ -390,6 +390,21 @@
                 transform: translateY(0);
             }
         }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 2px;
+            height: 1em; /* 글자 크기에 맞춰 높이 조절 */
+            background-color: var(--primary-black);
+            animation: typingBlink 0.7s infinite;
+            margin-left: 3px;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes typingBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
     </style>
 </head>
 
@@ -589,14 +604,55 @@
         
         // --- 초기화 및 UI 이벤트 ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 페이지 기본 설정
             setTimeout(() => { document.getElementById('splash').classList.add('fade-out'); }, 1500);
             fetchAllProducts();
             loadAIModel();
+            updateUITexts();
         
+            // [추가 시작] 타이핑 효과 애니메이션 코드
+            const appTitle = document.getElementById('appTitle');
+            
+            function typeWriter(element, text, speed, callback) {
+                let i = 0;
+                
+                function type() {
+                    if (i < text.length) {
+                        // 글자를 하나씩 추가하며 커서를 맨 뒤에 붙입니다.
+                        element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        // 타이핑이 끝나면 커서를 제거하고 다음 동작(callback)을 실행합니다.
+                        element.innerHTML = text;
+                        if (callback) callback();
+                    }
+                }
+                type();
+            }
+        
+            // 1. 페이지 로드 후 0.5초 뒤에 첫 번째 줄 타이핑 시작
+            setTimeout(() => {
+                appTitle.innerHTML = ''; // h1 내부를 비웁니다.
+                typeWriter(appTitle, '한국 제품을', 120, () => {
+                    // 2. 첫 번째 줄이 끝나면 줄바꿈(<br>)을 추가하고 잠시 대기
+                    appTitle.innerHTML += '<br>';
+                    setTimeout(() => {
+                        // 3. 두 번째 줄 타이핑 시작
+                        typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 120, () => {
+                            // 4. 모든 타이핑이 끝나면 커서를 다시 추가해 계속 깜빡이게 둡니다.
+                             appTitle.innerHTML += '<span class="typing-cursor"></span>';
+                        });
+                    }, 300); // 줄바꿈 후 0.3초 대기
+                });
+            }, 500); // 페이지 로드 후 0.5초 대기
+            // [추가 끝]
+        
+            // --- 검색 기능 이벤트 리스너 (기존 코드 유지) ---
             let searchTimeout;
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
-        
+            
             const performSearch = () => {
                 clearTimeout(searchTimeout);
                 const query = searchInput.value.trim();
@@ -612,7 +668,7 @@
                     performSearch();
                 }
             });
-        
+            
             searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
                 const query = searchInput.value.trim();
@@ -620,8 +676,6 @@
                     searchTimeout = setTimeout(performSearch, 500);
                 }
             });
-        
-            updateUITexts();
         });
         
         // --- AI 이미지 인식 함수 ---
