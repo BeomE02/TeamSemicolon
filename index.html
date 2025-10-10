@@ -405,12 +405,44 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0; }
         }
+
+        /* [추가] 로고와 부제를 감싸는 컨테이너 스타일 */
+        .splash-logo-container {
+            display: flex;
+            flex-direction: column; /* 세로로 정렬 */
+            align-items: center;   /* 가운데 정렬 */
+        }
+        
+        /* [추가] 부제('TeamSemicolon') 스타일 */
+        .splash-subtitle {
+            width: 100%; /* 너비를 부모('HANNUN')와 동일하게 설정 */
+            display: flex;
+            justify-content: space-between; /* 글자들을 양쪽 끝에 맞춰 펼침 */
+            
+            font-size: 0.8rem; /* 작은 글자 크기 */
+            font-weight: 400;
+            color: var(--primary-white);
+            margin-top: 0.75rem; /* HANNUN과의 간격 */
+            
+            opacity: 0; /* 애니메이션 시작 전 숨김 */
+            animation: subtitleFadeIn 1.2s ease-out 0.6s forwards; /* 한 박자 늦게(0.6초) 시작 */
+        }
+        
+        /* [추가] 부제를 위한 애니메이션 키프레임 */
+        @keyframes subtitleFadeIn {
+            to {
+                opacity: 0.7; /* 메인 로고보다 약간 흐리게 설정 */
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="splash-screen" id="splash"> 
-        <div class="splash-title">HANNUN</div> 
+    <div class="splash-screen" id="splash">
+        <div class="splash-logo-container">
+            <div class="splash-title" id="splashTitle"></div>
+            <div class="splash-subtitle" id="splashSubtitle"></div>
+        </div>
     </div>
     
     <main class="home-screen" id="home"> 
@@ -604,44 +636,71 @@
         
         // --- 초기화 및 UI 이벤트 ---
         document.addEventListener('DOMContentLoaded', () => {
-            // 페이지 기본 설정
-            setTimeout(() => { document.getElementById('splash').classList.add('fade-out'); }, 1500);
+            // --- 기본 설정 및 데이터 로딩 ---
             fetchAllProducts();
             loadAIModel();
             updateUITexts();
         
-            // 타이핑 효과 애니메이션 코드
+            // --- 1. 스플래시 화면 애니메이션 설정 ---
+            // 'HANNUN' 로고 애니메이션
+            const splashTitle = document.getElementById('splashTitle');
+            const text = "HANNUN";
+            const letters = text.split('');
+            letters.forEach((letter, i) => {
+                const span = document.createElement('span');
+                span.textContent = letter;
+                span.style.animationDelay = `${i * 0.1}s`;
+                splashTitle.appendChild(span);
+            });
+        
+            // 'TeamSemicolon' 부제 애니메이션
+            const splashSubtitle = document.getElementById('splashSubtitle');
+            const subtitleText = "TeamSemicolon";
+            subtitleText.split('').forEach(letter => {
+                const span = document.createElement('span');
+                span.textContent = letter;
+                splashSubtitle.appendChild(span);
+            });
+        
+            // 스플래시 화면이 사라지는 시간 설정 (애니메이션이 충분히 보일 수 있도록 2.5초로 조정)
+            setTimeout(() => {
+                document.getElementById('splash').classList.add('fade-out');
+            }, 2500);
+        
+        
+            // --- 2. 메인 화면 타이핑 애니메이션 설정 ---
             const appTitle = document.getElementById('appTitle');
             
             function typeWriter(element, text, speed, callback) {
                 let i = 0;
-                
                 function type() {
                     if (i < text.length) {
                         element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
                         i++;
                         setTimeout(type, speed);
                     } else {
-                        element.innerHTML = text;
+                        element.innerHTML = text; // 타이핑 완료 후 커서 제거
                         if (callback) callback();
                     }
                 }
                 type();
             }
         
+            // 스플래시 화면이 사라진 후에 타이핑이 시작되도록 딜레이 조정 (2초)
             setTimeout(() => {
-                appTitle.innerHTML = '';
+                appTitle.innerHTML = ''; // h1 내부 비우기
                 typeWriter(appTitle, '한국 제품을', 120, () => {
                     appTitle.innerHTML += '<br>';
                     setTimeout(() => {
                         typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 120, () => {
-                            // [수정 완료] 모든 타이핑이 끝난 후 커서를 추가하는 코드를 제거했습니다.
+                            // 모든 타이핑 완료
                         });
                     }, 300);
                 });
-            }, 500);
+            }, 2000);
         
-            // --- 검색 기능 이벤트 리스너 (기존 코드 유지) ---
+        
+            // --- 3. 검색 기능 이벤트 리스너 (기존 코드 유지) ---
             let searchTimeout;
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
