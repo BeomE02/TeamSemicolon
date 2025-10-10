@@ -392,7 +392,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"> 
                             <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /> 
                         </svg> 
-                    </div> 
+                    </div>
                     <div class="option-info"> 
                         <h3 class="option-title" id="searchByName">상품명 검색</h3> 
                         <p class="option-desc" id="searchByNameDesc">이름이나 브랜드로 제품 찾기</p> 
@@ -526,14 +526,17 @@
         };
         
         // --- AI 모델 클래스 이름 ---
-        const CLASS_NAMES = ['delos_red', 'delos_blue', 'tissue_ryan', 'tissue_crocodile'];
-        
+        const CLASS_NAMES = ['coffee', 'milk'];
+         
         // 한글 이름 매핑
         const KOREAN_NAMES = {
-            'delos_red': '델로스 빨간색',
-            'delos_blue': '델로스 파란색', 
-            'tissue_ryan': '각티슈 라이언',
-            'tissue_crocodile': '각티슈 악어'
+            'coffee': '커피',
+            'milk': '우유'
+        };
+
+        const TEST_BARCODES = {
+            'coffee': '8801115112117',
+            'milk': '8801115111018'
         };
         
         // --- 다국어 텍스트 ---
@@ -638,45 +641,58 @@
         }
         
         async function captureAndRecognize(video) {
-            const canvas = document.createElement('canvas');
-            // [수정] 캔버스 크기를 224x224에서 640x640으로 변경
-            canvas.width = 640;
-            canvas.height = 640;
-            const ctx = canvas.getContext('2d');
-            
-            // 비디오 프레임을 캔버스에 맞게 그리기
-            ctx.drawImage(video, 0, 0, 640, 640);
-            
-            try {
-                const productClass = await recognizeProductFromImage(canvas);
-                
-                if (productClass && productClass !== lastDetectedClass) {
-                    lastDetectedClass = productClass;
-                    detectionCooldown = true;
-                    
-                    const koreanName = KOREAN_NAMES[productClass] || productClass;
-                    
-                    const infoEl = document.getElementById('aiDetectionInfo');
-                    infoEl.textContent = `✅ 인식됨: ${koreanName}`;
-                    infoEl.style.display = 'block';
-                    infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
-                    
-                    if (navigator.vibrate) navigator.vibrate(100);
-                    
-                    setTimeout(async () => {
-                        closeAIScanner();
-                        await getDetailsAndShow(koreanName);
-                    }, 1500);
-                } else if (!productClass) {
-                    const infoEl = document.getElementById('aiDetectionInfo');
-                    infoEl.textContent = '제품을 화면 중앙에 맞춰주세요';
-                    infoEl.style.display = 'block';
-                    infoEl.style.background = 'rgba(0, 0, 0, 0.8)';
-                }
-            } catch (error) {
-                console.error('인식 오류:', error);
-            }
-        }
+            const canvas = document.createElement('canvas');
+            canvas.width = 640;
+            canvas.height = 640;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.drawImage(video, 0, 0, 640, 640);
+            
+            try {
+                const productClass = await recognizeProductFromImage(canvas);
+                
+                if (productClass && productClass !== lastDetectedClass) {
+                    lastDetectedClass = productClass;
+                    detectionCooldown = true;
+                    
+                    // [수정된 로직 시작]
+                    // 1. 인식된 클래스 이름으로 한글 이름과 테스트 바코드를 찾습니다.
+                    const koreanName = KOREAN_NAMES[productClass] || productClass;
+                    const barcode = TEST_BARCODES[productClass];
+        
+                    const infoEl = document.getElementById('aiDetectionInfo');
+                    infoEl.textContent = `✅ 인식됨: ${koreanName}`;
+                    infoEl.style.display = 'block';
+                    infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
+                    
+                    if (navigator.vibrate) navigator.vibrate(100);
+                    
+                    // 2. 바코드가 있으면 바코드로 제품을 찾고, 없으면 원래대로 이름으로 찾습니다.
+                    if (barcode) {
+                        console.log(`'${productClass}' 인식됨 -> 바코드 '${barcode}'로 검색 실행`);
+                        setTimeout(() => {
+                            closeAIScanner();
+                            findProductByBarcode(barcode); // 바코드로 검색하는 함수 호출
+                        }, 1500);
+                    } else {
+                        console.log(`'${productClass}'에 대한 테스트 바코드 없음 -> 이름으로 검색 실행`);
+                        setTimeout(async () => {
+                            closeAIScanner();
+                            await getDetailsAndShow(koreanName); // 원래대로 이름으로 상세정보 검색
+                        }, 1500);
+                    }
+                    // [수정된 로직 끝]
+        
+                } else if (!productClass) {
+                    const infoEl = document.getElementById('aiDetectionInfo');
+                    infoEl.textContent = '제품을 화면 중앙에 맞춰주세요';
+                    infoEl.style.display = 'block';
+                    infoEl.style.background = 'rgba(0, 0, 0, 0.8)';
+                }
+            } catch (error) {
+                console.error('인식 오류:', error);
+            }
+        }
         
         function closeAIScanner() {
             if (aiScannerInterval) {
