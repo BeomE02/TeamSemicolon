@@ -395,15 +395,15 @@
             // 스플래시 화면이 사라진 후에 타이핑이 시작되도록 딜레이 조정 (2초)
             setTimeout(() => {
                 appTitle.innerHTML = ''; // h1 내부 비우기
-                typeWriter(appTitle, '한국 제품을', 120, () => {
+                typeWriter(appTitle, '한국 제품을', 100, () => {
                     appTitle.innerHTML += '<br>';
                     setTimeout(() => {
-                        typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 120, () => {
+                        typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 100, () => {
                             // 모든 타이핑 완료
                         });
-                    }, 300);
+                    }, 200);
                 });
-            }, 2000);
+            }, 5000);
         
         
             // --- 3. 검색 기능 이벤트 리스너 (기존 코드 유지) ---
