@@ -368,24 +368,10 @@
                 splashTitle.appendChild(span);
             });
         
-            // 'TeamSemicolon' 부제 애니메이션
-            const splashSubtitle = document.getElementById('splashSubtitle');
-            const subtitleText = "TeamSemicolon";
-            const baseDelay = 0.4; // 'HANNUN'보다 0.4초 늦게 시작
-            
-            // "TeamSemicolon"을 한 글자씩 쪼개서 span으로 만들고, 순차적으로 딜레이 적용
-            subtitleText.split('').forEach((letter, i) => {
-                const span = document.createElement('span');
-                span.textContent = letter;
-                // 기본 딜레이(0.4s)에 순차적인 딜레이(0.1s)를 더함
-                span.style.animationDelay = `${baseDelay + (i * 0.1)}s`;
-                splashSubtitle.appendChild(span);
-            });
-        
             // 스플래시 화면이 사라지는 시간 설정 (애니메이션이 충분히 보일 수 있도록 2.5초로 조정)
             setTimeout(() => {
                 document.getElementById('splash').classList.add('fade-out');
-            }, 2500);
+            }, 5000);
         
         
             // --- 2. 메인 화면 타이핑 애니메이션 설정 ---
