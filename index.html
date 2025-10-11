@@ -618,7 +618,7 @@
             });
             
             // 신뢰도 70% 이상일 때 인식 (90%에서 낮춤)
-            if (maxScore >= 0.70) {
+            if (maxScore >= 0.95) {
                 return CLASS_NAMES[maxIndex];
             } else if (maxScore >= 0.50) {
                 console.log('⚠️ 신뢰도 부족:', `${(maxScore * 100).toFixed(1)}% (최소 70% 필요)`);
