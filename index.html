@@ -283,6 +283,15 @@
             'getorade',   // 4
             'almond'      // 5
         ];
+
+        const CLASS_BARCODES = {
+        'chocopie': '8801117535398',
+        'tonk': '8801117269203',
+        'coffee': '8801121652022',
+        'milk': '8801121112380',
+        'getorade': '8801056052256',
+        'almond': '' // 비워둠 - 나중에 수정 가능
+    };
         
         // --- 다국어 텍스트 및 지원 언어 ---
         const supportedLanguages = [
@@ -453,10 +462,19 @@
                             infoEl.style.display = 'block';
                             infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
                             if (navigator.vibrate) navigator.vibrate(100);
+                            
+                            // 바코드 가져오기
+                            const barcode = CLASS_BARCODES[topDetection.className];
+                            
+                            // 바코드가 있으면 검색, 없으면 알림
                             setTimeout(() => {
-                                detectionCooldown = false; 
-                                lastDetectedClass = null;
-                            }, 2000);
+                                closeAIScanner();
+                                if (barcode) {
+                                    findProductByBarcode(barcode);
+                                } else {
+                                    showToast(`${topDetection.className}의 바코드가 등록되지 않았습니다.`);
+                                }
+                            }, 1000); // 1초 후 자동 검색
                         }
                     } else {
                         const infoEl = document.getElementById('aiDetectionInfo');
