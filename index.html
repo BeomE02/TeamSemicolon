@@ -850,7 +850,7 @@
                 const response = await fetch(GEMINI_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }], "generationConfig": { "temperature": 0.3, "maxOutputTokens": 500 } }) 
+                    body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }], "generationConfig": { "temperature": 0.3, "maxOutputTokens": 200 } }) 
                 });
                 if (!response.ok) throw new Error(`Gemini API 오류: Status ${response.status}`);
                 const data = await response.json();
