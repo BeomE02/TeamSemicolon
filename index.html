@@ -66,9 +66,28 @@
         #ai-scanner-viewport { width: 100%; height: 100%; position: relative; }
         #ai-scanner-video { width: 100%; height: 100%; object-fit: cover; }
         .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .scan-guide { width: 70%; max-width: 300px; height: 120px; position: relative; border: 2px solid #00FF00; }
-        .scan-line { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00FF00; animation: scan 2s cubic-bezier(0.5, 0, 0.5, 1) infinite; box-shadow: 0 0 8px #00FF00; }
-        @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(118px); } }
+        .scan-guide { width: 70%; max-width: 300px; height: 120px; position: relative; border: none; }
+        .scan-corner { position: absolute; width: 40px; height: 40px; border: 3px solid #00FF00; animation: cornerPulse 2s ease-in-out infinite; }
+        .scan-corner.top-left { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .scan-corner.top-right { top: 0; right: 0; border-left: none; border-bottom: none; }
+        .scan-corner.bottom-left { bottom: 0; left: 0; border-right: none; border-top: none; }
+        .scan-corner.bottom-right { bottom: 0; right: 0; border-left: none; border-top: none; }
+        @keyframes cornerPulse { 0%, 100% { opacity: 0.6; box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); } 50% { opacity: 1; box-shadow: 0 0 20px rgba(0, 255, 0, 0.8); } }
+        .scan-lines { position: absolute; inset: 0; overflow: hidden; }
+        .scan-line-horizontal { position: absolute; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent 0%, #00FF00 20%, #00FF00 80%, transparent 100%); box-shadow: 0 0 10px #00FF00; animation: scanHorizontal 3s ease-in-out infinite; }
+        .scan-line-vertical { position: absolute; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, transparent 0%, #00FF00 20%, #00FF00 80%, transparent 100%); box-shadow: 0 0 10px #00FF00; animation: scanVertical 2.5s ease-in-out infinite; animation-delay: 0.5s; }
+        @keyframes scanHorizontal { 0%, 100% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        @keyframes scanVertical { 0%, 100% { left: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+        .scan-particles { position: absolute; inset: 0; pointer-events: none; }
+        .particle { position: absolute; width: 4px; height: 4px; background: #00FF00; border-radius: 50%; opacity: 0; animation: particleFloat 3s ease-in-out infinite; box-shadow: 0 0 6px #00FF00; }
+        .particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 30%; animation-delay: 0.5s; }
+        .particle:nth-child(3) { left: 50%; animation-delay: 1s; }
+        .particle:nth-child(4) { left: 70%; animation-delay: 1.5s; }
+        .particle:nth-child(5) { left: 90%; animation-delay: 2s; }
+        @keyframes particleFloat { 0% { top: 100%; opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { top: 0; opacity: 0; } }
+        .scan-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px); background-size: 20px 20px; animation: gridPulse 2s ease-in-out infinite; }
+        @keyframes gridPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
         .ai-detection-info { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; font-weight: 600; }
         .manual-input { padding: 1.5rem; background: var(--light-gray); border-top: 1px solid var(--border-color); }
         .barcode-input { width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--primary-black); border-radius: 0; font-size: 1rem; text-align: center; margin-bottom: 0.8rem; outline: none; background-color: var(--primary-white); transition: all 0.2s ease-out; box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); }
@@ -192,9 +211,31 @@
             <div class="scanner-container" id="scanner-container"> 
                 <div id="scanner-viewport"></div> 
                 <div class="scan-overlay"> 
-                    <div class="scan-guide"> 
-                        <div class="scan-line"></div> 
-                    </div> 
+                    <div class="scan-guide">
+                        <!-- 네 모서리 -->
+                        <div class="scan-corner top-left"></div>
+                        <div class="scan-corner top-right"></div>
+                        <div class="scan-corner bottom-left"></div>
+                        <div class="scan-corner bottom-right"></div>
+                        
+                        <!-- 스캔 라인 -->
+                        <div class="scan-lines">
+                            <div class="scan-line-horizontal"></div>
+                            <div class="scan-line-vertical"></div>
+                        </div>
+                        
+                        <!-- 그리드 오버레이 -->
+                        <div class="scan-grid"></div>
+                        
+                        <!-- 입자 효과 -->
+                        <div class="scan-particles">
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                            <div class="particle"></div>
+                        </div>
+                    </div>
                 </div> 
             </div> 
             <div class="manual-input"> 
