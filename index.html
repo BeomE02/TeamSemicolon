@@ -7,150 +7,89 @@
     <link rel="stylesheet" as="style" crossorigin
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    :root { --primary-black: #111111; --primary-white: #ffffff; --accent-gray: #777777; --light-gray: #f2f2f2; --border-color: #dddddd; --hover-color: #e8e8e8; --focus-ring: rgba(17, 17, 17, 0.15); }
-    body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--primary-white); color: var(--primary-black); line-height: 1.5; overflow-x: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    
-    .splash-screen { position: fixed; inset: 0; background: var(--primary-black); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out; gap: 1.5rem; color: var(--primary-white); }
-    .splash-screen.fade-out { opacity: 0; pointer-events: none; }
-
-    /* [수정] .splash-title 자체의 애니메이션은 제거하고, 컨테이너 역할만 하도록 정리 */
-    .splash-title {
-        font-size: 3.5rem;
-        font-weight: 800;
-        letter-spacing: -0.05em;
-        display: flex;
-    }
-    
-    /* [추가] 로고와 부제를 감싸는 컨테이너 스타일 */
-    .splash-logo-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    /* [유지] .splash-title과 .splash-subtitle 내부의 span에 동일한 애니메이션 적용 */
-    .splash-title span,
-    .splash-subtitle span {
-        opacity: 0.2;
-        animation: letterBlink 2s infinite;
-    }
-
-    /* [추가] 깜빡이는 애니메이션 키프레임 (이전에 빠져있던 부분) */
-    @keyframes letterBlink {
-        0%, 100% {
-            opacity: 0.2;
-            text-shadow: none;
-        }
-        50% {
-            opacity: 1;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-        }
-    }
-    
-    /* [유지] .splash-subtitle 스타일 */
-    .splash-subtitle {
-        display: flex;
-        font-size: 0.8rem;
-        font-weight: 500;
-        color: var(--primary-white);
-        margin-top: 0.75rem;
-        letter-spacing: -0.02em;
-    }
-
-    .home-screen { min-height: 100vh; padding: 2.5rem 1.5rem; display: flex; flex-direction: column; align-items: center; }
-    .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .logo-image { height: 32px; vertical-align: middle; }
-    .lang-btn { padding: 0.6rem 1rem; background: var(--light-gray); border: 1px solid var(--border-color); border-radius: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: none; display: flex; align-items: center; gap: 0.4rem; }
-    .main-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 1rem; align-items: center; text-align: center; gap: 2.5rem; width: 100%; max-width: 500px; }
-    
-    /* [수정] h1 자체의 애니메이션은 JavaScript가 제어하므로 CSS 애니메이션 속성 제거 */
-    .welcome-text h1 { 
-        font-size: clamp(2.2rem, 8vw, 3.2rem); 
-        font-weight: 800; 
-        line-height: 1.2; 
-        letter-spacing: -0.04em; 
-        margin-bottom: 0.8rem; 
-    }
-    .welcome-text p { font-size: 1.15rem; color: var(--accent-gray); font-weight: 500; }
-
-    /* [삭제] welcome-text h1에 적용되던 불필요한 키프레임 제거 */
-    /* @keyframes textFadeInUp { ... } */
-
-    /* [유지] 타이핑 커서 스타일 */
-    .typing-cursor {
-        display: inline-block;
-        width: 2px;
-        height: 1em;
-        background-color: var(--primary-black);
-        animation: typingBlink 0.7s infinite;
-        margin-left: 3px;
-        vertical-align: text-bottom;
-    }
-    
-    @keyframes typingBlink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
-    }
-
-    /* --- 이하 기존 스타일은 그대로 유지 --- */
-    .search-options { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
-    .search-option { background: var(--primary-white); border: 2px solid var(--primary-black); border-radius: 0; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease-out; box-shadow: 4px 4px 0px var(--primary-black); }
-    .search-option:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--primary-black); background-color: var(--light-gray); }
-    .option-icon { width: 3.5rem; height: 3.5rem; color: var(--primary-black); background: var(--light-gray); border-radius: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border-color); padding: 0.5rem; }
-    .option-icon svg { width: 100%; height: 100%; object-fit: contain; }
-    .option-info { flex: 1; text-align: left; }
-    .option-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
-    .option-desc { font-size: 0.9rem; color: var(--accent-gray); line-height: 1.4; font-weight: 400; }
-    .page-slide-right { position: fixed; inset: 0; background: var(--primary-white); z-index: 1000; transition: transform 0.3s cubic-bezier(0.7, 0, 0.3, 1); box-shadow: none; overflow-y: auto; transform: translateX(100%); }
-    .page-slide-right.active { transform: translateX(0); }
-    .page-header { background: var(--primary-white); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.8rem; border-bottom: 2px solid var(--primary-black); z-index: 100; position: sticky; top: 0; }
-    .back-btn { width: 44px; height: 44px; border-radius: 0; background: var(--primary-black); color: var(--primary-white); border: none; font-size: 1.5rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-out; box-shadow: none; }
-    .header-logo { flex: 1; text-align: center; margin-right: 44px; cursor: pointer; transition: opacity 0.2s; }
-    .header-logo:hover { opacity: 0.7; }
-    .search-bar-container { flex: 1; display: flex; gap: 0.5rem; }
-    .search-input { flex: 1; padding: 0.8rem 1.2rem; border: 2px solid var(--primary-black); border-radius: 0; background: var(--light-gray); font-size: 1rem; outline: none; transition: all 0.2s ease-out; box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); }
-    .search-submit-btn { width: 44px; height: 44px; border: 2px solid var(--primary-black); background: var(--primary-black); color: var(--primary-white); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .results-container { padding: 0.5rem 1.5rem; }
-    .result-card { background: transparent; border-bottom: 1px solid var(--border-color); padding: 1rem 0.5rem; cursor: pointer; transition: background-color 0.15s ease-out; }
-    .result-card:hover { background-color: var(--light-gray); }
-    .result-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.2rem; }
-    .result-desc { font-size: 0.85rem; color: var(--accent-gray); font-weight: 400; }
-    .detail-hero { padding: 0; background: var(--light-gray); border-bottom: 2px solid var(--primary-black); text-align: center; }
-    .detail-image { width: 100%; height: 250px; object-fit: contain; background-color: white; }
-    .detail-text-content { padding: 2rem 1.5rem; background: var(--primary-white); text-align: left;}
-    .detail-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
-    .detail-subtitle { font-size: 1rem; color: var(--accent-gray); margin-bottom: 0; font-weight: 500; }
-    .info-grid { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; border-top: 1px solid var(--border-color); }
-    .info-item { background: transparent; padding: 0.9rem 0.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-    .info-label { font-size: 0.9rem; color: var(--accent-gray); font-weight: 500; flex-shrink: 0; padding-right: 1rem; }
-    .info-value { font-size: 0.95rem; font-weight: 600; text-align: right; color: var(--primary-black); word-break: break-all; width: 40%; }
-    .scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 1rem; }
-    .scanner-modal.active { display: flex; }
-    .barcode-modal-content { background: var(--primary-white); border-radius: 0; width: 100%; max-width: 500px; margin: 0 auto; overflow: hidden; display: flex; flex-direction: column; border: 2px solid var(--primary-black); box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2); }
-    .barcode-header { background: var(--primary-black); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; color: var(--primary-white); }
-    .close-scan-btn { width: 36px; height: 36px; border-radius: 0; background: rgba(255, 255, 255, 0.2); border: none; color: var(--primary-white); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .scan-title { font-size: 1.1rem; font-weight: 700; flex: 1; text-align: center; margin-right: 2.25rem; }
-    .scanner-container { position: relative; background: #000; height: 280px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-    #scanner-viewport, #scanner-viewport video, #scanner-viewport canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
-    #ai-scanner-viewport { width: 100%; height: 100%; position: relative; }
-    #ai-scanner-video { width: 100%; height: 100%; object-fit: cover; }
-    .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .scan-guide { width: 70%; max-width: 300px; height: 120px; position: relative; border: 2px solid #00FF00; }
-    .scan-line { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00FF00; animation: scan 2s cubic-bezier(0.5, 0, 0.5, 1) infinite; box-shadow: 0 0 8px #00FF00; }
-    @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(118px); } }
-    .ai-detection-info { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; font-weight: 600; }
-    .manual-input { padding: 1.5rem; background: var(--light-gray); border-top: 1px solid var(--border-color); }
-    .barcode-input { width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--primary-black); border-radius: 0; font-size: 1rem; text-align: center; margin-bottom: 0.8rem; outline: none; background-color: var(--primary-white); transition: all 0.2s ease-out; box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); }
-    .search-barcode-btn { width: 100%; padding: 0.9rem; background: var(--primary-black); color: var(--primary-white); border: 2px solid var(--primary-black); border-radius: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease-out; box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); }
-    .loading { text-align: center; padding: 3rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--border-color); border-top-color: var(--primary-black); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .toast { position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary-black); color: var(--primary-white); padding: 0.8rem 1.2rem; border-radius: 0; font-size: 0.9rem; z-index: 5000; opacity: 0; transition: all 0.3s ease-out; box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2); }
-    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-    .no-results { text-align: center; padding: 4rem 1.5rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
-    @media (max-width: 600px) { input[type="text"], input[type="number"] { font-size: 16px; } }
-</style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --primary-black: #111111; --primary-white: #ffffff; --accent-gray: #777777; --light-gray: #f2f2f2; --border-color: #dddddd; --hover-color: #e8e8e8; }
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--primary-white); color: var(--primary-black); line-height: 1.5; overflow-x: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        .splash-screen { position: fixed; inset: 0; background: var(--primary-black); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out; gap: 1.5rem; color: var(--primary-white); }
+        .splash-screen.fade-out { opacity: 0; pointer-events: none; }
+        .splash-title { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.05em; display: flex; }
+        .splash-logo-container { display: flex; flex-direction: column; align-items: center; }
+        .splash-title span, .splash-subtitle span { opacity: 0.2; animation: letterBlink 2s infinite; }
+        @keyframes letterBlink { 0%, 100% { opacity: 0.2; text-shadow: none; } 50% { opacity: 1; text-shadow: 0 0 12px rgba(255, 255, 255, 0.8); } }
+        .splash-subtitle { display: flex; font-size: 0.8rem; font-weight: 500; color: var(--primary-white); margin-top: 0.75rem; letter-spacing: -0.02em; }
+        .home-screen { min-height: 100vh; padding: 2.5rem 1.5rem; display: flex; flex-direction: column; align-items: center; }
+        .header { width: 100%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .logo-image { height: 32px; vertical-align: middle; }
+        .lang-selector { padding: 0.6rem 1rem; background: var(--light-gray); border: 1px solid var(--border-color); border-radius: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; box-shadow: none; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='3' stroke='%23111111'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 1em; padding-right: 2.5rem; }
+        .main-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 1rem; align-items: center; text-align: center; gap: 2.5rem; width: 100%; max-width: 500px; }
+        .welcome-text h1 { font-size: clamp(2.2rem, 8vw, 3.2rem); font-weight: 800; line-height: 1.2; letter-spacing: -0.04em; margin-bottom: 0.8rem; }
+        .welcome-text p { font-size: 1.15rem; color: var(--accent-gray); font-weight: 500; }
+        .typing-cursor { display: inline-block; width: 2px; height: 1em; background-color: var(--primary-black); animation: typingBlink 0.7s infinite; margin-left: 3px; vertical-align: text-bottom; }
+        @keyframes typingBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        .search-options { width: 100%; display: flex; flex-direction: column; gap: 1rem; }
+        .search-option { background: var(--primary-white); border: 2px solid var(--primary-black); border-radius: 0; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease-out; box-shadow: 4px 4px 0px var(--primary-black); }
+        .search-option:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--primary-black); background-color: var(--light-gray); }
+        .option-icon { width: 3.5rem; height: 3.5rem; color: var(--primary-black); background: var(--light-gray); border-radius: 0; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border-color); padding: 0.5rem; }
+        .option-icon svg { width: 100%; height: 100%; object-fit: contain; }
+        .option-info { flex: 1; text-align: left; }
+        .option-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
+        .option-desc { font-size: 0.9rem; color: var(--accent-gray); line-height: 1.4; font-weight: 400; }
+        .page-slide-right { position: fixed; inset: 0; background: var(--primary-white); z-index: 1000; transition: transform 0.3s cubic-bezier(0.7, 0, 0.3, 1); box-shadow: none; overflow-y: auto; transform: translateX(100%); }
+        .page-slide-right.active { transform: translateX(0); }
+        .page-header { background: var(--primary-white); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.8rem; border-bottom: 2px solid var(--primary-black); z-index: 100; position: sticky; top: 0; }
+        .back-btn { width: 44px; height: 44px; border-radius: 0; background: var(--primary-black); color: var(--primary-white); border: none; font-size: 1.5rem; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease-out; box-shadow: none; }
+        .header-logo { flex: 1; text-align: center; margin-right: 44px; cursor: pointer; transition: opacity 0.2s; }
+        .header-logo:hover { opacity: 0.7; }
+        .search-bar-container { flex: 1; display: flex; gap: 0.5rem; }
+        .search-input { flex: 1; padding: 0.8rem 1.2rem; border: 2px solid var(--primary-black); border-radius: 0; background: var(--light-gray); font-size: 1rem; outline: none; transition: all 0.2s ease-out; box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); }
+        .search-submit-btn { width: 44px; height: 44px; border: 2px solid var(--primary-black); background: var(--primary-black); color: var(--primary-white); cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .results-container { padding: 0.5rem 1.5rem; }
+        .result-card { background: transparent; border-bottom: 1px solid var(--border-color); padding: 1rem 0.5rem; cursor: pointer; transition: background-color 0.15s ease-out; }
+        .result-card:hover { background-color: var(--light-gray); }
+        .result-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.2rem; }
+        .result-desc { font-size: 0.85rem; color: var(--accent-gray); font-weight: 400; }
+        .detail-text-content { padding: 2rem 1.5rem; background: var(--primary-white); text-align: left;}
+        .detail-title { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+        .detail-subtitle { font-size: 1rem; color: var(--accent-gray); margin-bottom: 0; font-weight: 500; }
+        .info-grid { display: flex; flex-direction: column; gap: 0; margin: 1.5rem 0; border-top: 1px solid var(--border-color); }
+        .info-item { background: transparent; padding: 0.9rem 0.25rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .info-label { font-size: 0.9rem; color: var(--accent-gray); font-weight: 500; flex-shrink: 0; padding-right: 1rem; }
+        .info-value { font-size: 0.95rem; font-weight: 600; text-align: right; color: var(--primary-black); word-break: break-all; width: 40%; }
+        .scanner-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); z-index: 3000; display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .scanner-modal.active { display: flex; }
+        .barcode-modal-content { background: var(--primary-white); border-radius: 0; width: 100%; max-width: 80vw; margin: 0 auto; overflow: hidden; display: flex; flex-direction: column; border: 2px solid var(--primary-black); box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.2); }
+        .barcode-header { background: var(--primary-black); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; color: var(--primary-white); }
+        .close-scan-btn { width: 36px; height: 36px; border-radius: 0; background: rgba(255, 255, 255, 0.2); border: none; color: var(--primary-white); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .scan-title { font-size: 1.1rem; font-weight: 700; flex: 1; text-align: center; margin-right: 2.25rem; }
+        .scanner-container { position: relative; background: #000; height: 400px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        #scanner-viewport, #scanner-viewport video, #scanner-viewport canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
+        #ai-scanner-viewport { width: 100%; height: 100%; position: relative; }
+        #ai-scanner-video { width: 100%; height: 100%; object-fit: cover; }
+        .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .scan-guide { width: 70%; max-width: 300px; height: 120px; position: relative; border: 2px solid #00FF00; }
+        .scan-line { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #00FF00; animation: scan 2s cubic-bezier(0.5, 0, 0.5, 1) infinite; box-shadow: 0 0 8px #00FF00; }
+        @keyframes scan { 0% { transform: translateY(0); } 100% { transform: translateY(118px); } }
+        .ai-detection-info { position: absolute; bottom: 1rem; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.8); color: white; padding: 0.5rem 1rem; border-radius: 4px; font-size: 0.9rem; font-weight: 600; }
+        .manual-input { padding: 1.5rem; background: var(--light-gray); border-top: 1px solid var(--border-color); }
+        .barcode-input { width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--primary-black); border-radius: 0; font-size: 1rem; text-align: center; margin-bottom: 0.8rem; outline: none; background-color: var(--primary-white); transition: all 0.2s ease-out; box-shadow: inset 2px 2px 0px rgba(0, 0, 0, 0.1); }
+        .search-barcode-btn { width: 100%; padding: 0.9rem; background: var(--primary-black); color: var(--primary-white); border: 2px solid var(--primary-black); border-radius: 0; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease-out; box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2); }
+        .loading { text-align: center; padding: 3rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
+        .spinner { width: 36px; height: 36px; border: 3px solid var(--border-color); border-top-color: var(--primary-black); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .toast { position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--primary-black); color: var(--primary-white); padding: 0.8rem 1.2rem; border-radius: 0; font-size: 0.9rem; z-index: 5000; opacity: 0; transition: all 0.3s ease-out; box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2); }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .no-results { text-align: center; padding: 4rem 1.5rem; color: var(--accent-gray); font-weight: 500; font-size: 1rem; }
+        .recent-searches-title { font-size: 0.9rem; font-weight: 600; color: var(--accent-gray); padding: 1rem 1.5rem 0.5rem; }
+        .recent-searches-list { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0 1.5rem 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 1rem; }
+        .recent-search-item { display: flex; align-items: center; gap: 0.5rem; background: var(--light-gray); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.9rem; cursor: pointer; transition: background-color 0.2s ease; }
+        .recent-search-item:hover { background-color: var(--hover-color); }
+        .delete-search-btn { background: none; border: none; font-size: 1.2rem; color: var(--accent-gray); cursor: pointer; padding: 0; line-height: 1; }
+        .delete-search-btn:hover { color: var(--primary-black); }
+        .credit-footer { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .credit-logo { height: 2rem; width: auto; }
+        .credit-text { font-size: 1rem; font-weight: bolder; color: #000; }
+        @media (max-width: 600px) { input[type="text"], input[type="number"] { font-size: 16px; } }
+    </style>
 </head>
 
 <body>
@@ -165,10 +104,7 @@
             <div class="logo"> 
                 <img src="logo.jpeg" alt="HANNUN Logo" class="logo-image">
             </div> 
-            <button class="lang-btn" onclick="toggleLanguage()"> 
-                <span id="langFlag">🇰🇷</span> 
-                <span id="langCode">KO</span> 
-            </button> 
+            <select id="langSelector" class="lang-selector" onchange="changeLanguage()"></select>
         </header> 
         
         <div class="main-content"> 
@@ -214,10 +150,13 @@
                     </div>
                 </div>
             </div> 
+            <div class="credit-footer">
+                <img src="ditlogo.png" alt="DIT Logo" class="credit-logo">
+                <p class="credit-text">컴퓨터소프트웨어과</p>
+            </div>
         </div> 
     </main>
 
-    <!-- 검색 결과 페이지 -->
     <div class="page-slide-right" id="searchResults"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -230,10 +169,10 @@
                 </button>
             </div>
         </div> 
+        <div id="recentSearchesContainer"></div>
         <div class="results-container" id="resultsContainer"></div> 
     </div>
 
-    <!-- 상세 정보 페이지 -->
     <div class="page-slide-right" id="detail"> 
         <div class="page-header"> 
             <button class="back-btn" onclick="goBack()">←</button> 
@@ -244,7 +183,6 @@
         <div id="detailPageContent"></div> 
     </div>
 
-    <!-- 바코드 스캐너 모달 -->
     <div class="scanner-modal" id="scannerModal"> 
         <div class="barcode-modal-content"> 
             <div class="barcode-header"> 
@@ -266,7 +204,6 @@
         </div> 
     </div>
 
-    <!-- AI 실시간 인식 모달 -->
     <div class="scanner-modal" id="aiScannerModal">
         <div class="barcode-modal-content">
             <div class="barcode-header">
@@ -279,7 +216,7 @@
                 </div>
                 <div class="scan-overlay">
                     <div class="scan-guide">
-                        <div class="scan-line"></div>
+                         <div class="bottom-corners"></div>
                     </div>
                 </div>
                 <div class="ai-detection-info" id="aiDetectionInfo" style="display:none;"></div>
@@ -287,7 +224,6 @@
         </div>
     </div>
 
-    <!-- 토스트 알림 -->
     <div class="toast" id="toast"></div>
 
 
@@ -298,6 +234,7 @@
         const FOOD_API_KEY = 'c320de96f22d4183bd13';
         const TRANSLATE_API_KEY = 'AIzaSyArr1P7f6JuAL8Xz8ECiHi8WkfbNRn4Z7I';
         const GEMINI_API_KEY = 'AIzaSyDrsbT0bzRyi1WOA3byzJI8VOIY2NpYa6Y';
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
         const PROXY_URL = 'https://corsproxy.io/?';
         const FOOD_API_BASE = `https://openapi.foodsafetykorea.go.kr/api/${FOOD_API_KEY}/C005/json`;
         
@@ -307,137 +244,46 @@
         let pageHistory = ['home'];
         let isTranslatingCache = false;
         let productModel = null;
+        let recentSearches = [];
+        const MAX_RECENT_SEARCHES = 5;
         
-        // --- 캐시 객체 추가 (성능 최적화) ---
+        // --- 캐시 객체 ---
         const cache = {
             details: {},
-            images: {},
             geminiLists: {}
         };
         
-        // --- AI 모델 클래스 이름 ---
-        const CLASS_NAMES = ['coffee', 'milk'];
-         
-        // 한글 이름 매핑
-        const KOREAN_NAMES = {
-            'coffee': '커피',
-            'milk': '우유'
-        };
+        const AI_MODEL_INPUT_SIZE = 640;
 
-        const TEST_BARCODES = {
-            'coffee': '8801121652022',
-            'milk': '8801121112380'
-        };
+        // --- AI 모델 클래스 이름 ---
+        const CLASS_NAMES = [
+            'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+            'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+            'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+            'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+            'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+            'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+            'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+            'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
+            'hair drier', 'toothbrush'
+        ];
         
-        // --- 다국어 텍스트 ---
+        // --- 다국어 텍스트 및 지원 언어 ---
+        const supportedLanguages = [
+            { code: 'ko', name: '🇰🇷 한국어' }, { code: 'en', name: '🇺🇸 English' }, { code: 'ja', name: '🇯🇵 日本語' },
+            { code: 'zh-CN', name: '🇨🇳 中文 (简体)' }, { code: 'es', name: '🇪🇸 Español' }, { code: 'fr', name: '🇫🇷 Français' },
+            { code: 'de', name: '🇩🇪 Deutsch' }, { code: 'vi', name: '🇻🇳 Tiếng Việt' }, { code: 'th', name: '🇹🇭 ภาษาไทย' },
+            { code: 'ru', name: '🇷🇺 Русский' }
+        ];
+
         const translations = {
-            ko: { 
-                appTitle: '한국 제품을<br>쉽게 찾아보세요', 
-                appSubtitle: '검색 방법을 선택하세요', 
-                searchByName: '상품명 검색', 
-                searchByNameDesc: '이름이나 브랜드로 제품 찾기', 
-                scanBarcode: '바코드 스캔', 
-                scanBarcodeDesc: '바코드로 정확하게 제품 찾기', 
-                searchByImage: 'AI 실시간 인식', 
-                searchByImageDesc: '카메라로 제품을 비추면 자동 인식', 
-                searchPlaceholder: '상품명을 입력하세요...', 
-                productDetail: '상품 상세 정보', 
-                manufacturer: '제조사', 
-                expiry: '소비기한', 
-                barcode: '바코드', 
-                reportNumber: '품목보고번호', 
-                searching: '검색 중...', 
-                noResults: '검색 결과가 없습니다', 
-                loadingInfo: '정보를 불러오는 중...', 
-                errorLoading: '정보를 불러오는 중 오류 발생', 
-                barcodeTitle: '바코드 스캐너', 
-                search: '검색', 
-                product_found: '상품을 찾았습니다!', 
-                product_not_found: '상품을 찾을 수 없습니다.', 
-                camera_error: '카메라를 사용할 수 없습니다.', 
-                invalid_barcode: '유효한 바코드 번호를 입력해주세요.', 
-                translation_needed: '번역을 위해 API 키가 필요합니다.', 
-                preparing_dictionary: '사전 데이터 준비 중...', 
-                gemini_searching: '검색중...', 
-                translating: '번역 중...', 
-                ai_recognizing: 'AI 인식 중...', 
-                model_loading: 'AI 모델 로딩 중...', 
-                image_recognition_failed: '제품을 인식하지 못했습니다.',
-                aiScanTitle: 'AI 실시간 인식' // 스캐너 제목도 원래대로 수정
-            },
-            en: { 
-                appTitle: 'Find Korean<br>Products Easily', 
-                appSubtitle: 'Choose your search method', 
-                searchByName: 'Search by Name', 
-                searchByNameDesc: 'Find products using their name', 
-                scanBarcode: 'Scan Barcode', 
-                scanBarcodeDesc: 'Find products with their barcode', 
-                searchByImage: 'Live AI Recognition', 
-                searchByImageDesc: 'Point your camera to recognize products', 
-                searchPlaceholder: 'Enter product name...', 
-                productDetail: 'Product Details', 
-                manufacturer: 'Manufacturer', 
-                expiry: 'Shelf Life', 
-                barcode: 'Barcode', 
-                reportNumber: 'Report No.', 
-                searching: 'Searching...', 
-                noResults: 'No search results found', 
-                loadingInfo: 'Loading information...', 
-                errorLoading: 'Error loading details', 
-                barcodeTitle: 'Barcode Scanner', 
-                search: 'Search', 
-                product_found: 'Product Found!', 
-                product_not_found: 'Product not found.', 
-                camera_error: 'Could not access camera.', 
-                invalid_barcode: 'Please enter a valid barcode.', 
-                translation_needed: 'API key is required for translation.', 
-                preparing_dictionary: 'Preparing dictionary...', 
-                gemini_searching: 'Searching...', 
-                translating: 'Translating...', 
-                ai_recognizing: 'AI recognizing...', 
-                model_loading: 'Loading AI model...', 
-                image_recognition_failed: 'Failed to recognize product.',
-                aiScanTitle: 'Live AI Recognition' // 스캐너 제목도 원래대로 수정
-            },
-            ja: { 
-                appTitle: '韓国製品を<br>簡単に見つけよう', 
-                appSubtitle: '검색 방법を選んでください', 
-                searchByName: '商品名で検索', 
-                searchByNameDesc: '商品名で製品を検索', 
-                scanBarcode: 'バーコードをスキャン', 
-                scanBarcodeDesc: 'バーコードで製品を検索', 
-                searchByImage: 'AIリアルタイム認識', 
-                searchByImageDesc: 'カメラで製品をかざして自動認識', 
-                searchPlaceholder: '商品名を入力...', 
-                productDetail: '商品詳細', 
-                manufacturer: '製造社', 
-                expiry: '消費期限', 
-                barcode: 'バーコード', 
-                reportNumber: '品目報告番号', 
-                searching: '検索中...', 
-                noResults: '検索結果がありません', 
-                loadingInfo: '情報を読み込み中...', 
-                errorLoading: 'エラーが発生しました', 
-                barcodeTitle: 'バーコードスキャナー', 
-                search: '検索', 
-                product_found: '製品が見つかりました！', 
-                product_not_found: '製品が見つかりません', 
-                camera_error: 'カメラにアクセスできません', 
-                invalid_barcode: '有効なバーコードを入力してください', 
-                translation_needed: '翻訳にはAPIキーが必要です', 
-                preparing_dictionary: '辞書を準備しています...', 
-                gemini_searching: '検索中...', 
-                translating: '翻訳中...', 
-                ai_recognizing: 'AI認識中...', 
-                model_loading: 'AIモデル読み込み中...', 
-                image_recognition_failed: '製品を認識できませんでした',
-                aiScanTitle: 'AIリアルタイム認識' // 스캐너 제목도 원래대로 수정
-            }
+            ko: { appTitle: '한국 제품을<br>쉽게 찾아보세요', appSubtitle: '검색 방법을 선택하세요', searchByName: '상품명 검색', searchByNameDesc: '이름이나 브랜드로 제품 찾기', scanBarcode: '바코드 스캔', scanBarcodeDesc: '바코드로 정확하게 제품 찾기', searchByImage: 'AI 실시간 인식', searchByImageDesc: '카메라로 제품을 비추면 자동 인식', searchPlaceholder: '상품명을 입력하세요...', productDetail: '상품 상세 정보', manufacturer: '제조사', barcode: '바코드', searching: '검색 중...', noResults: '검색 결과가 없습니다', loadingInfo: '정보를 불러오는 중...', errorLoading: '정보를 불러오는 중 오류 발생', barcodeTitle: '바코드 스캐너', aiScanTitle: 'AI 실시간 인식', search: '검색', product_not_found: '상품을 찾을 수 없습니다.', camera_error: '카메라를 사용할 수 없습니다.', invalid_barcode: '유효한 바코드 번호를 입력해주세요.', preparing_dictionary: '사전 데이터 준비 중...', gemini_searching: '연관 상품 검색 중...', translating: '번역 중...', model_loading: 'AI 모델 로딩 중...', recent_searches: '최근 검색어', ai_demo_toast: 'AI 인식은 데모 모델로 작동합니다. (예: 사람, 컵)' },
+            en: { appTitle: 'Find Korean<br>Products Easily', appSubtitle: 'Choose your search method', searchByName: 'Search by Name', searchByNameDesc: 'Find products using their name', scanBarcode: 'Scan Barcode', scanBarcodeDesc: 'Find products with their barcode', searchByImage: 'Live AI Recognition', searchByImageDesc: 'Point your camera to recognize products', searchPlaceholder: 'Enter product name...', productDetail: 'Product Details', manufacturer: 'Manufacturer', barcode: 'Barcode', searching: 'Searching...', noResults: 'No search results found', loadingInfo: 'Loading information...', errorLoading: 'Error loading details', barcodeTitle: 'Barcode Scanner', aiScanTitle: 'Live AI Recognition', search: 'Search', product_not_found: 'Product not found.', camera_error: 'Could not access camera.', invalid_barcode: 'Please enter a valid barcode.', preparing_dictionary: 'Preparing dictionary...', gemini_searching: 'Searching related items...', translating: 'Translating...', model_loading: 'Loading AI model...', recent_searches: 'Recent Searches', ai_demo_toast: 'AI Recognition is running on a demo model (e.g., person, cup).' },
+            ja: { appTitle: '韓国製品を<br>簡単に見つけよう', appSubtitle: '検索方法を選んでください', searchByName: '商品名で検索', searchByNameDesc: '商品名で製品を検索', scanBarcode: 'バーコードをスキャン', scanBarcodeDesc: 'バーコードで製品を検索', searchByImage: 'AIリアルタイム認識', searchByImageDesc: 'カメラで製品を自動認識', searchPlaceholder: '商品名を入力...', productDetail: '商品詳細', manufacturer: '製造社', barcode: 'バーコード', searching: '検索中...', noResults: '検索結果がありません', loadingInfo: '情報を読み込み中...', errorLoading: 'エラーが発生しました', barcodeTitle: 'バーコードスキャナー', aiScanTitle: 'AIリアルタイム認識', search: '検索', product_not_found: '製品が見つかりません', camera_error: 'カメラにアクセスできません', invalid_barcode: '有効なバーコードを入力してください', preparing_dictionary: '辞書を準備しています...', gemini_searching: '関連商品を検索中...', translating: '翻訳中...', model_loading: 'AIモデル読み込み中...', recent_searches: '最近の検索', ai_demo_toast: 'AI認識はデモモデルで動作します（例：人、カップ）。' }
         };
         
-        const getText = (key) => translations[currentLang][key] || key;
+        const getText = (key) => (translations[currentLang] && translations[currentLang][key]) || (translations['ko'] && translations['ko'][key]) || key;
         
-        // --- AI 모델 로드 ---
         async function loadAIModel() {
             try {
                 showToast(getText('model_loading'));
@@ -448,128 +294,75 @@
             }
         }
         
-        // --- 초기화 및 UI 이벤트 ---
         document.addEventListener('DOMContentLoaded', () => {
-            // --- 기본 설정 및 데이터 로딩 ---
             fetchAllProducts();
             loadAIModel();
-            updateUITexts();
         
-            // --- 1. 스플래시 화면 애니메이션 설정 ---
-            // 'HANNUN' 로고 애니메이션
+            const langSelector = document.getElementById('langSelector');
+            supportedLanguages.forEach(lang => {
+                const option = document.createElement('option');
+                option.value = lang.code;
+                option.textContent = lang.name;
+                if (lang.code === currentLang) option.selected = true;
+                langSelector.appendChild(option);
+            });
+            updateUITexts();
+
             const splashTitle = document.getElementById('splashTitle');
             const text = "HANNUN";
-            const letters = text.split('');
-            letters.forEach((letter, i) => {
+            text.split('').forEach((letter, i) => {
                 const span = document.createElement('span');
                 span.textContent = letter;
                 span.style.animationDelay = `${i * 0.1}s`;
                 splashTitle.appendChild(span);
             });
-        
-            // 스플래시 화면이 사라지는 시간 설정 (애니메이션이 충분히 보일 수 있도록 2.5초로 조정)
             setTimeout(() => {
                 document.getElementById('splash').classList.add('fade-out');
-            }, 5000);
-        
-        
-            // --- 2. 메인 화면 타이핑 애니메이션 설정 ---
+            }, 2500);
+
             const appTitle = document.getElementById('appTitle');
-            
-            function typeWriter(element, text, speed, callback) {
+            setTimeout(() => {
+                appTitle.innerHTML = '';
+                typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 100);
+            }, 3000);
+
+            function typeWriter(element, text, speed) {
                 let i = 0;
-                function type() {
+                const typing = () => {
                     if (i < text.length) {
                         element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
                         i++;
-                        setTimeout(type, speed);
+                        setTimeout(typing, speed);
                     } else {
-                        element.innerHTML = text; // 타이핑 완료 후 커서 제거
-                        if (callback) callback();
+                        element.innerHTML = text;
                     }
-                }
-                type();
+                };
+                typing();
             }
-        
-            // 스플래시 화면이 사라진 후에 타이핑이 시작되도록 딜레이 조정 (5초)
-            setTimeout(() => {
-                appTitle.innerHTML = ''; // h1 내부 비우기
-                
-                // 1. 첫 번째 줄("한국 제품을") 타이핑을 시작합니다.
-                typeWriter(appTitle, '한국 제품을', 100, () => {
-                    // 2. 첫 번째 줄이 끝나면, 두 번째 줄을 "이어서" 타이핑하는 새 로직을 실행합니다.
-                    const line2 = "쉽게 찾아보세요";
-                    let i = 0;
-                    const baseContent = appTitle.innerHTML + '<br>'; // 현재 내용("한국 제품을<br>")을 저장합니다.
-            
-                    function typeSecondLine() {
-                        if (i < line2.length) {
-                            // 저장된 내용에 두 번째 줄을 한 글자씩 추가합니다.
-                            appTitle.innerHTML = baseContent + line2.substring(0, i + 1) + '<span class="typing-cursor"></span>';
-                            i++;
-                            setTimeout(typeSecondLine, 100); // 속도를 100으로 유지
-                        } else {
-                            // 3. 모든 타이핑이 끝나면 커서 없이 최종 텍스트만 남깁니다.
-                            appTitle.innerHTML = baseContent + line2;
-                        }
-                    }
-            
-                    // 0.2초 후 두 번째 줄 타이핑을 시작합니다.
-                    setTimeout(typeSecondLine, 200);
-                });
-            }, 5000);
-        
-        
-            // --- 3. 검색 기능 이벤트 리스너 (기존 코드 유지) ---
+
             let searchTimeout;
             const searchInput = document.getElementById('searchInput');
             const searchBtn = document.getElementById('searchBtn');
-            
             const performSearch = () => {
                 clearTimeout(searchTimeout);
                 const query = searchInput.value.trim();
-                if (query.length > 0) {
-                    searchProducts(query);
-                }
+                if (query.length > 0) searchProducts(query);
             };
-            
             searchBtn.addEventListener('click', performSearch);
-            
-            searchInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-            
+            searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); });
             searchInput.addEventListener('input', () => {
                 clearTimeout(searchTimeout);
                 const query = searchInput.value.trim();
-                if (query.length > 0) {
-                    searchTimeout = setTimeout(performSearch, 500);
-                }
+                if (query.length > 0) searchTimeout = setTimeout(performSearch, 500);
             });
         });
         
-        // --- AI 이미지 인식 함수 ---
-        let aiScannerStream = null;
-        let aiScannerInterval = null;
-        let lastDetectedBarcode = null;
-        let lastDetectedClass = null; 
-        let detectionCooldown = false;
+        let aiScannerStream = null, aiScannerInterval = null, lastDetectedClass = null, detectionCooldown = false;
         
         function openImageSearch() {
             const modal = document.getElementById('aiScannerModal');
-            if (!modal) {
-                console.error('aiScannerModal 요소를 찾을 수 없습니다');
-                showToast('AI 스캐너를 초기화할 수 없습니다');
-                return;
-            }
-            
-            if (!productModel) {
-                showToast(getText('model_loading'));
-                return;
-            }
-            
+            if (!modal || !productModel) { showToast(getText('model_loading')); return; }
+            showToast(getText('ai_demo_toast'));
             modal.classList.add('active');
             startAIScanner();
         }
@@ -577,18 +370,9 @@
         async function startAIScanner() {
             try {
                 const video = document.getElementById('ai-scanner-video');
-                aiScannerStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: 640, height: 480 }
-                });
+                aiScannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: 640, height: 480 } });
                 video.srcObject = aiScannerStream;
-                
-                // 0.5초마다 프레임 캡처 및 인식
-                aiScannerInterval = setInterval(async () => {
-                    if (!detectionCooldown) {
-                        await captureAndRecognize(video);
-                    }
-                }, 500);
-                
+                aiScannerInterval = setInterval(async () => { if (!detectionCooldown) await captureAndRecognize(video); }, 500);
             } catch (error) {
                 console.error('카메라 접근 실패:', error);
                 showToast(getText('camera_error'));
@@ -596,162 +380,104 @@
             }
         }
         
-        async function captureAndRecognize(video) {
+        async function captureAndRecognize(video) {
             const canvas = document.createElement('canvas');
-            canvas.width = 640;
-            canvas.height = 640;
+            canvas.width = AI_MODEL_INPUT_SIZE;
+            canvas.height = AI_MODEL_INPUT_SIZE;
             const ctx = canvas.getContext('2d');
-            
-            ctx.drawImage(video, 0, 0, 640, 640);
-            
-            try {
-                const productClass = await recognizeProductFromImage(canvas);
-                
-                if (productClass && productClass !== lastDetectedClass) {
-                    lastDetectedClass = productClass;
-                    detectionCooldown = true;
-                    
-                    // [수정된 로직 시작]
-                    // 1. 인식된 클래스 이름으로 한글 이름과 테스트 바코드를 찾습니다.
-                    const koreanName = KOREAN_NAMES[productClass] || productClass;
-                    const barcode = TEST_BARCODES[productClass];
-        
-                    const infoEl = document.getElementById('aiDetectionInfo');
-                    infoEl.textContent = `✅ 인식됨: ${koreanName}`;
-                    infoEl.style.display = 'block';
-                    infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
-                    
-                    if (navigator.vibrate) navigator.vibrate(100);
-                    
-                    // 2. 바코드가 있으면 바코드로 제품을 찾고, 없으면 원래대로 이름으로 찾습니다.
-                    if (barcode) {
-                        console.log(`'${productClass}' 인식됨 -> 바코드 '${barcode}'로 검색 실행`);
+            const scale = Math.min(AI_MODEL_INPUT_SIZE / video.videoWidth, AI_MODEL_INPUT_SIZE / video.videoHeight);
+            const x = (AI_MODEL_INPUT_SIZE - video.videoWidth * scale) / 2;
+            const y = (AI_MODEL_INPUT_SIZE - video.videoHeight * scale) / 2;
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, AI_MODEL_INPUT_SIZE, AI_MODEL_INPUT_SIZE);
+            ctx.drawImage(video, x, y, video.videoWidth * scale, video.videoHeight * scale);
+            canvas.toBlob(async (blob) => {
+                try {
+                    const productClass = await recognizeProductFromImage(blob);
+                    if (productClass && productClass !== lastDetectedClass) {
+                        lastDetectedClass = productClass;
+                        detectionCooldown = true;
+                        const infoEl = document.getElementById('aiDetectionInfo');
+                        infoEl.textContent = `✅ 인식됨: ${productClass}`;
+                        infoEl.style.display = 'block';
+                        infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
+                        if (navigator.vibrate) navigator.vibrate(100);
                         setTimeout(() => {
-                            closeAIScanner();
-                            findProductByBarcode(barcode); // 바코드로 검색하는 함수 호출
-                        }, 1500);
-                    } else {
-                        console.log(`'${productClass}'에 대한 테스트 바코드 없음 -> 이름으로 검색 실행`);
-                        setTimeout(async () => {
-                            closeAIScanner();
-                            await getDetailsAndShow(koreanName); // 원래대로 이름으로 상세정보 검색
-                        }, 1500);
+                            detectionCooldown = false; 
+                            lastDetectedClass = null;
+                        }, 2000);
+                    } else if (!productClass) {
+                        const infoEl = document.getElementById('aiDetectionInfo');
+                        infoEl.textContent = '인식할 수 있는 사물을 비춰주세요';
+                        infoEl.style.display = 'block';
+                        infoEl.style.background = 'rgba(0, 0, 0, 0.8)';
                     }
-                    // [수정된 로직 끝]
-        
-                } else if (!productClass) {
-                    const infoEl = document.getElementById('aiDetectionInfo');
-                    infoEl.textContent = '제품을 화면 중앙에 맞춰주세요';
-                    infoEl.style.display = 'block';
-                    infoEl.style.background = 'rgba(0, 0, 0, 0.8)';
-                }
-            } catch (error) {
-                console.error('인식 오류:', error);
-            }
+                } catch (error) { console.error('인식 오류:', error); }
+            }, 'image/jpeg', 0.8);
         }
         
         function closeAIScanner() {
-            if (aiScannerInterval) {
-                clearInterval(aiScannerInterval);
-                aiScannerInterval = null;
-            }
-            
-            if (aiScannerStream) {
-                aiScannerStream.getTracks().forEach(track => track.stop());
-                aiScannerStream = null;
-            }
-            
+            if (aiScannerInterval) { clearInterval(aiScannerInterval); aiScannerInterval = null; }
+            if (aiScannerStream) { aiScannerStream.getTracks().forEach(track => track.stop()); aiScannerStream = null; }
             document.getElementById('aiScannerModal').classList.remove('active');
             document.getElementById('aiDetectionInfo').style.display = 'none';
-            
-            lastDetectedBarcode = null;
+            lastDetectedClass = null;
             detectionCooldown = false;
         }
         
         async function recognizeProductFromImage(imageFile) {
-            if (!productModel) {
-                throw new Error('모델이 로드되지 않았습니다');
-            }
-        
+            if (!productModel) throw new Error('모델이 로드되지 않았습니다');
             const tensor = await preprocessImage(imageFile);
             const feeds = { images: tensor };
             const results = await productModel.run(feeds);
-            
-            // 🔍 디버그: 모델 출력 구조 확인 (처음 한 번만)
-            if (!window.modelDebugDone) {
-                console.log('=== 모델 출력 디버그 ===');
-                console.log('출력 키:', Object.keys(results));
-                for (let key in results) {
-                    const output = results[key];
-                    console.log(`${key}:`, {
-                        shape: output.dims,
-                        dataType: output.type,
-                        dataLength: output.data.length,
-                        샘플데이터: Array.from(output.data.slice(0, 20))
-                    });
-                }
-                console.log('=======================');
-                window.modelDebugDone = true;
-            }
-            
-            // 분류 모델 출력 처리
             const output = results[Object.keys(results)[0]];
             const predictions = output.data;
-            
-            // 가장 높은 확률의 클래스 찾기
-            let maxIndex = 0;
-            let maxScore = predictions[0];
-            
-            for (let i = 1; i < CLASS_NAMES.length; i++) {
+            let maxIndex = 0, maxScore = 0;
+            for (let i = 0; i < predictions.length; i++) {
                 if (predictions[i] > maxScore) {
                     maxScore = predictions[i];
                     maxIndex = i;
                 }
             }
-            
-            console.log('🎯 예측 결과:', {
-                클래스: CLASS_NAMES[maxIndex],
-                한글명: KOREAN_NAMES[CLASS_NAMES[maxIndex]],
-                신뢰도: `${(maxScore * 100).toFixed(1)}%`,
-                전체확률: Array.from(predictions).map((p, i) => `${CLASS_NAMES[i]}: ${(p * 100).toFixed(1)}%`)
-            });
-            
-            // 신뢰도 70% 이상일 때 인식 (90%에서 낮춤)
-            if (maxScore >= 0.95) {
+            if (maxScore >= 0.70) {
+                console.log(`🎯 예측 결과: ${CLASS_NAMES[maxIndex]} (${(maxScore * 100).toFixed(1)}%)`);
                 return CLASS_NAMES[maxIndex];
-            } else if (maxScore >= 0.50) {
-                console.log('⚠️ 신뢰도 부족:', `${(maxScore * 100).toFixed(1)}% (최소 70% 필요)`);
-            } else {
-                console.log('🔇 노이즈 감지 (무시됨)');
             }
-            
             return null;
         }
         
-        async function preprocessImage(imageSource) {
-            // [수정] 처리할 이미지 크기를 224에서 640으로 변경
-            const size = 640;
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(imageSource, 0, 0, size, size);
-            
-            const imageData = ctx.getImageData(0, 0, size, size);
-            const float32Data = new Float32Array(3 * size * size);
-            
-            // HWC -> CHW 변환 및 정규화
-            for (let i = 0; i < size * size; i++) {
-                float32Data[i] = imageData.data[i * 4] / 255.0; // R
-                float32Data[i + size * size] = imageData.data[i * 4 + 1] / 255.0; // G
-                float32Data[i + 2 * size * size] = imageData.data[i * 4 + 2] / 255.0; // B
-            }
-            
-            const tensor = new ort.Tensor('float32', float32Data, [1, 3, size, size]);
-            return tensor;
-        }
+        async function preprocessImage(imageFile) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const size = AI_MODEL_INPUT_SIZE;
+                    canvas.width = size;
+                    canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, size, size);
+                    const scale = Math.min(size / img.width, size / img.height);
+                    const x = (size - img.width * scale) / 2;
+                    const y = (size - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    const imageData = ctx.getImageData(0, 0, size, size);
+                    const float32Data = new Float32Array(3 * size * size);
+                    for (let c = 0; c < 3; c++) {
+                        for (let h = 0; h < size; h++) {
+                            for (let w = 0; w < size; w++) {
+                                const idx = (h * size + w) * 4 + c;
+                                float32Data[c * size * size + h * size + w] = imageData.data[idx] / 255.0;
+                            }
+                        }
+                    }
+                    const tensor = new ort.Tensor('float32', float32Data, [1, 3, size, size]);
+                    resolve(tensor);
+                };
+                img.src = URL.createObjectURL(imageFile);
+            });
+        }
         
-        // --- 페이지 관리 ---
         function showPage(pageId) {
             const newPage = document.getElementById(pageId);
             if (newPage && pageHistory[pageHistory.length - 1] !== pageId) {
@@ -759,9 +485,8 @@
                 pageHistory.push(pageId);
             }
             if (pageId === 'searchResults') {
-                if (isTranslatingCache) {
-                    document.getElementById('resultsContainer').innerHTML = `<div class="loading"><div class="spinner"></div>${getText('preparing_dictionary')}</div>`;
-                }
+                if (isTranslatingCache) document.getElementById('resultsContainer').innerHTML = `<div class="loading"><div class="spinner"></div>${getText('preparing_dictionary')}</div>`;
+                displayRecentSearches();
                 document.getElementById('searchInput').focus();
             }
         }
@@ -770,7 +495,7 @@
             if (pageHistory.length <= 1) return;
             const currentPageId = pageHistory.pop();
             const currentPage = document.getElementById(currentPageId);
-            if (currentPage) { currentPage.classList.remove('active'); }
+            if (currentPage) currentPage.classList.remove('active');
             if (currentPageId === 'searchResults') {
                 document.getElementById('searchInput').value = '';
                 document.getElementById('resultsContainer').innerHTML = '';
@@ -784,7 +509,6 @@
             document.getElementById('resultsContainer').innerHTML = '';
         }
         
-        // --- UI 업데이트 ---
         function updateUITexts() {
             document.getElementById('appTitle').innerHTML = getText('appTitle');
             document.getElementById('appSubtitle').textContent = getText('appSubtitle');
@@ -796,21 +520,40 @@
             document.getElementById('searchByImageDesc').textContent = getText('searchByImageDesc');
             document.getElementById('searchInput').placeholder = getText('searchPlaceholder');
             document.getElementById('barcodeScanTitle').textContent = getText('barcodeTitle');
+            document.getElementById('aiScanTitle').textContent = getText('aiScanTitle');
             document.getElementById('searchBarcodeBtn').textContent = getText('search');
         }
         
-        async function toggleLanguage() {
-            const langs = ['ko', 'en', 'ja'];
-            const flags = { ko: '🇰🇷', en: '🇺🇸', ja: '🇯🇵' };
-            const codes = { ko: 'KO', en: 'EN', ja: 'JP' };
-            currentLang = langs[(langs.indexOf(currentLang) + 1) % langs.length];
-            document.getElementById('langFlag').textContent = flags[currentLang];
-            document.getElementById('langCode').textContent = codes[currentLang];
+        async function changeLanguage() {
+            const selector = document.getElementById('langSelector');
+            currentLang = selector.value;
+            await translateUIRealtime(currentLang);
             updateUITexts();
             await translateProductCache(currentLang);
         }
+
+        async function translateUIRealtime(targetLang) {
+            if (translations[targetLang] || targetLang === 'ko') return;
+            showToast(getText('translating'));
+            const koreanUI = translations['ko'];
+            const keysToTranslate = Object.keys(koreanUI);
+            const valuesToTranslate = Object.values(koreanUI).map(v => v.replace(/<br>/g, ' '));
+            try {
+                const translatedValues = await translate(valuesToTranslate, 'ko', targetLang, true);
+                translations[targetLang] = {};
+                keysToTranslate.forEach((key, index) => {
+                    if (koreanUI[key].includes('<br>')) {
+                        translations[targetLang][key] = translatedValues[index].replace(/\s/g, '<br>');
+                    } else {
+                        translations[targetLang][key] = translatedValues[index];
+                    }
+                });
+            } catch (error) {
+                console.error("UI 실시간 번역 실패:", error);
+                showToast("UI 번역 중 오류가 발생했습니다.");
+            }
+        }
         
-        // --- 데이터 처리 및 API 호출 ---
         async function fetchAllProducts() {
             if (searchCache) return;
             const url = `${FOOD_API_BASE}/1/1000`;
@@ -829,20 +572,16 @@
         }
         
         async function translateProductCache(targetLang) {
-            if (targetLang === 'ko' || !searchCache || isTranslatingCache) return;
+            if (targetLang === 'ko' || !searchCache || isTranslatingCache || !['en', 'ja'].includes(targetLang)) return;
             const firstProduct = searchCache[0];
             if (firstProduct && firstProduct[`PRDLST_NM_${targetLang}`]) return;
             isTranslatingCache = true;
             showToast(getText('preparing_dictionary'));
-            const activePage = pageHistory[pageHistory.length - 1];
-            if (activePage === 'searchResults') {
-                document.getElementById('resultsContainer').innerHTML = `<div class="loading"><div class="spinner"></div>${getText('preparing_dictionary')}</div>`;
-            }
             try {
                 const productNames = [...new Set(searchCache.map(p => p.PRDLST_NM).filter(Boolean))];
                 const companyNames = [...new Set(searchCache.map(p => p.BSSH_NM).filter(Boolean))];
                 const CHUNK_SIZE = 100;
-                async function processInChunks(names) {
+                const processInChunks = async (names) => {
                     const allTranslated = [];
                     for (let i = 0; i < names.length; i += CHUNK_SIZE) {
                         const chunk = names.slice(i, i + CHUNK_SIZE);
@@ -851,56 +590,51 @@
                         await new Promise(resolve => setTimeout(resolve, 100));
                     }
                     return allTranslated;
-                }
-                const [translatedProductNames, translatedCompanyNames] = await Promise.all([
-                    processInChunks(productNames),
-                    processInChunks(companyNames)
-                ]);
+                };
+                const [translatedProductNames, translatedCompanyNames] = await Promise.all([ processInChunks(productNames), processInChunks(companyNames) ]);
                 const productNameMap = new Map(productNames.map((name, i) => [name, translatedProductNames[i]]));
                 const companyNameMap = new Map(companyNames.map((name, i) => [name, translatedCompanyNames[i]]));
                 searchCache.forEach(product => {
                     if (product.PRDLST_NM) product[`PRDLST_NM_${targetLang}`] = productNameMap.get(product.PRDLST_NM);
                     if (product.BSSH_NM) product[`BSSH_NM_${targetLang}`] = companyNameMap.get(product.BSSH_NM);
                 });
-            } catch (error) {
-                console.error("번역 캐시 생성 실패:", error);
-                showToast("사전 데이터를 준비하는 데 실패했습니다.");
-            } finally {
-                isTranslatingCache = false;
-                if (activePage === 'searchResults') document.getElementById('resultsContainer').innerHTML = '';
-            }
+            } catch (error) { console.error("번역 캐시 생성 실패:", error); }
+            finally { isTranslatingCache = false; }
         }
         
         async function searchProducts(query) {
-            if (!searchCache || searchCache.length === 0) {
-                showToast("제품 데이터를 로딩 중입니다. 잠시 후 다시 시도해주세요.");
-                return;
-            }
+            if (!searchCache) { showToast("제품 데이터를 로딩 중입니다."); return; }
             const container = document.getElementById('resultsContainer');
             container.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('searching')}</div>`;
-            const lowerCaseQuery = query.toLowerCase();
-            const productNameKey = currentLang === 'ko' ? 'PRDLST_NM' : `PRDLST_NM_${currentLang}`;
-            const companyNameKey = currentLang === 'ko' ? 'BSSH_NM' : `BSSH_NM_${currentLang}`;
-        
-            const results = searchCache.filter(p =>
-                (p[productNameKey]?.toLowerCase().includes(lowerCaseQuery)) ||
-                (p[companyNameKey]?.toLowerCase().includes(lowerCaseQuery))
-            ).slice(0, 15);
-        
+            let searchQuery = query;
+            if (currentLang !== 'ko') {
+                try {
+                    showToast(getText('translating'));
+                    searchQuery = await translate(query, currentLang, 'ko');
+                } catch (e) {
+                    showToast('검색어 번역 실패');
+                    container.innerHTML = `<div class="no-results">검색어 번역에 실패했습니다.</div>`;
+                    return;
+                }
+            }
+            const lowerCaseQuery = searchQuery.toLowerCase();
+            const results = searchCache.filter(p => (p['PRDLST_NM']?.toLowerCase().includes(lowerCaseQuery)) || (p['BSSH_NM']?.toLowerCase().includes(lowerCaseQuery))).slice(0, 15);
+            
             if (results.length === 0) {
                 container.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('gemini_searching')}</div>`;
-                const originalKoreanList = await searchWithGeminiForList(query);
+                const originalKoreanList = await searchWithGeminiForList(searchQuery);
                 if (originalKoreanList && originalKoreanList.length > 0) {
                     let displayList = originalKoreanList;
                     if (currentLang !== 'ko') {
-                        showToast(getText('translating'));
-                        const namesToTranslate = originalKoreanList.map(item => item.name);
-                        const manufacturersToTranslate = originalKoreanList.map(item => item.manufacturer);
-                        const [translatedNames, translatedManufacturers] = await Promise.all([
-                            translate(namesToTranslate, 'ko', currentLang, true),
-                            translate(manufacturersToTranslate, 'ko', currentLang, true)
-                        ]);
-                        displayList = originalKoreanList.map((item, index) => ({ name: translatedNames[index], manufacturer: translatedManufacturers[index] }));
+                        try {
+                            const [translatedNames, translatedCompanies] = await Promise.all([
+                                translate(originalKoreanList.map(item => item.name), 'ko', currentLang, true),
+                                translate(originalKoreanList.map(item => item.manufacturer), 'ko', currentLang, true)
+                            ]);
+                            displayList = originalKoreanList.map((item, index) => ({ name: translatedNames[index], manufacturer: translatedCompanies[index] }));
+                        } catch (e) {
+                            showToast('결과 번역 실패');
+                        }
                     }
                     container.innerHTML = displayList.map((displayItem, index) => {
                         const originalProductName = originalKoreanList[index].name;
@@ -910,38 +644,44 @@
                     container.innerHTML = `<div class="no-results">${getText('noResults')}</div>`;
                 }
             } else {
-                container.innerHTML = results.map(product => {
-                    const displayName = product[productNameKey] || product.PRDLST_NM;
-                    const displayCompany = product[companyNameKey] || product.BSSH_NM;
-                    const originalProductName = product.PRDLST_NM;
-                    return `<div class="result-card" onclick="getDetailsAndShow('${originalProductName.replace(/"/g, '&quot;')}')"><h3 class="result-name">${displayName}</h3><p class="result-desc">${displayCompany}</p></div>`;
-                }).join('');
+                if(currentLang === 'ko') {
+                    displayResults(results);
+                } else {
+                    showToast(getText('translating'));
+                    try {
+                        const [translatedNames, translatedCompanies] = await Promise.all([
+                            translate(results.map(p => p.PRDLST_NM), 'ko', currentLang, true),
+                            translate(results.map(p => p.BSSH_NM), 'ko', currentLang, true)
+                        ]);
+                        const translatedResults = results.map((p, i) => ({ ...p, PRDLST_NM_TRANS: translatedNames[i], BSSH_NM_TRANS: translatedCompanies[i] }));
+                        displayResults(translatedResults, true);
+                    } catch(e) {
+                         showToast('결과 번역 실패');
+                         displayResults(results);
+                    }
+                }
             }
         }
-        
+
         async function searchWithGeminiForList(query) {
-            const cacheKey = `${query}_${currentLang}`;
-            if (cache.geminiLists[cacheKey]) {
-                return cache.geminiLists[cacheKey];
-            }
-        
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
+            const cacheKey = `${query}_gemini_list`;
+            if (cache.geminiLists[cacheKey]) return cache.geminiLists[cacheKey];
+            
             const prompt = `이제 검색엔진처럼 작동해봐. 예를들어 내가 진라면을 검색하면 너는 진라면 매운맛, 진라면 순한맛, 진라면 중간맛 등등 처럼 검색어 연관순으로 대답을 하는거야.이제 내가 '${query}'(으)로 검색하면 상품의 이름과 제조사를 '제품명 | 제조사' 형식으로 알려줘. 다른 설명, 숫자, 기호 없이, 한 줄에 하나씩만 나열해줘.`;
             try {
                 const response = await fetch(GEMINI_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        "contents": [{ "parts": [{ "text": prompt }] }],
-                        "generationConfig": {
-                            "temperature": 0.3,
-                            "maxOutputTokens": 500
-                        }
-                    }) 
+                    body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }], "generationConfig": { "temperature": 0.3, "maxOutputTokens": 500 } }) 
                 });
                 if (!response.ok) throw new Error(`Gemini API 오류: Status ${response.status}`);
                 const data = await response.json();
-                if (!data.candidates || !data.candidates[0].content.parts[0].text) throw new Error("Gemini로부터 유효한 답변을 받지 못했습니다.");
+                
+                if (!data.candidates || data.candidates.length === 0 || !data.candidates[0].content?.parts?.[0]?.text) {
+                    console.warn("Gemini로부터 유효한 답변(연관 검색어 목록)을 받지 못했습니다.", data);
+                    return [];
+                }
+
                 const rawText = data.candidates[0].content.parts[0].text;
                 const result = rawText.split('\n').map(line => {
                     const parts = line.split('|').map(part => part.trim());
@@ -956,51 +696,43 @@
                 return [];
             }
         }
+
+        function displayResults(results, isTranslated = false) {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = results.map(product => {
+                const displayName = isTranslated ? product.PRDLST_NM_TRANS : product.PRDLST_NM;
+                const displayCompany = isTranslated ? product.BSSH_NM_TRANS : product.BSSH_NM;
+                return `<div class="result-card" onclick="getDetailsAndShow('${product.PRDLST_NM.replace(/"/g, '&quot;')}')"><h3 class="result-name">${displayName}</h3><p class="result-desc">${displayCompany}</p></div>`;
+            }).join('');
+        }
         
-        async function getDetailsAndShow(productName) {
+        async function getDetailsAndShow(productName, originalBarcode = null) {
+            addRecentSearch(productName);
             showPage('detail');
             const content = document.getElementById('detailPageContent');
             content.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('loadingInfo')}</div>`;
             const cleanName = productName.replace(/&quot;/g, '"');
-        
             try {
                 const cacheKey = `${cleanName}_ko`;
                 let details = cache.details[cacheKey];
-                let imageURL = cache.images[cleanName];
-        
-                if (!details || !imageURL) {
-                    const results = await Promise.all([
-                        details ? Promise.resolve(details) : getGeminiProductDetails(cleanName),
-                        imageURL ? Promise.resolve(imageURL) : getProductImageURL(cleanName)
-                    ]);
-                    details = results[0];
-                    imageURL = results[1];
-                    
+                if (!details) {
+                    details = await getGeminiProductDetails(cleanName);
                     if (details) cache.details[cacheKey] = details;
-                    if (imageURL) cache.images[cleanName] = imageURL;
                 }
-        
                 if (details) {
-                    showProductDetail(details, imageURL);
-                } else {
-                    throw new Error(getText('errorLoading'));
-                }
-            } catch (error) {
-                content.innerHTML = `<div class="no-results">${error.message}</div>`;
-            }
+                    if(originalBarcode) {
+                        details['바코드'] = originalBarcode;
+                        details['바코드 번호'] = originalBarcode;
+                    }
+                    showProductDetail(details);
+                } else { throw new Error(getText('errorLoading')); }
+            } catch (error) { content.innerHTML = `<div class="no-results">${error.message}</div>`; }
         }
 
         async function getGeminiProductDetails(productName) {
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
             const prompt = `'${productName}'(이)라는 한국 상품에 대해 구매자가 궁금해할 만한 상세 정보를 알려줘. 항상 **제조사, 제품 카테고리, 바코드 번호**는 포함해줘. 만약 식품이라면 **칼로리, 영양성분(탄수화물, 단백질, 지방), 전체 성분, 알레르기 정보, 비건 여부**를 추가하고, 화장품이라면 **제품 유형(토너, 앰플 등), 주요 성분, 비건 여부**를 추가해줘. 정보가 없거나 해당 없는 항목은 제외하고, "항목: 값" 형식으로만 나열해줘.`;
             try {
-                const response = await fetch(GEMINI_URL, { 
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        "contents": [{ "parts": [{ "text": prompt }] }] 
-                    }) 
-                });
+                const response = await fetch(GEMINI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }] }) });
                 if (!response.ok) throw new Error(`Gemini API 오류: Status ${response.status}`);
                 const data = await response.json();
                 if (!data.candidates || !data.candidates[0].content.parts[0].text) throw new Error("Gemini로부터 유효한 답변을 받지 못했습니다.");
@@ -1022,87 +754,54 @@
             }
         }
         
-        async function getProductImageURL(productName) {
-            try {
-                const searchResults = await google_search.search({ queries: [`"${productName}" 제품 이미지`] });
-                const firstResult = searchResults.results[0]?.snippets[0];
-                if (firstResult && firstResult.thumbnail) {
-                    return firstResult.thumbnail;
-                }
-                return null;
-            } catch (error) {
-                console.error("이미지 검색 실패:", error);
-                return null;
-            }
-        }
-        
-        async function showProductDetail(productData, imageURL = null) {
+        async function showProductDetail(productData) {
             if (!productData) { goBack(); return; }
             showPage('detail');
             const content = document.getElementById('detailPageContent');
             content.innerHTML = `<div class="loading"><div class="spinner"></div>${getText('loadingInfo')}</div>`;
-            
             let pName = productData['상품명'] || '';
             let pCompany = productData['제조사'] || '-';
-            
             let infoItems = { ...productData };
             delete infoItems['상품명'];
             delete infoItems['제조사'];
-        
-            let title = pName;
-            let subtitle = pCompany;
-            let finalInfoItems = infoItems;
-        
-            if (currentLang !== 'ko' && (title || subtitle || Object.keys(finalInfoItems).length > 0)) {
+            let title = pName, subtitle = pCompany, finalInfoItems = infoItems;
+            if (currentLang !== 'ko') {
                 showToast(getText('translating'));
                 const keys = Object.keys(finalInfoItems);
                 const values = Object.values(finalInfoItems);
-                const [translatedTitle, translatedSubtitle, translatedKeys, translatedValues] = await Promise.all([
-                    translate(title, 'ko', currentLang),
-                    translate(subtitle, 'ko', currentLang),
-                    translate(keys, 'ko', currentLang, true),
-                    translate(values, 'ko', currentLang, true)
-                ]);
-                title = translatedTitle;
-                subtitle = translatedSubtitle;
-                finalInfoItems = {};
-                translatedKeys.forEach((key, index) => { finalInfoItems[key] = translatedValues[index]; });
+                try {
+                    const [translatedTitle, translatedSubtitle, translatedKeys, translatedValues] = await Promise.all([
+                        translate(title, 'ko', currentLang), translate(subtitle, 'ko', currentLang),
+                        translate(keys, 'ko', currentLang, true), translate(values, 'ko', currentLang, true)
+                    ]);
+                    title = translatedTitle;
+                    subtitle = translatedSubtitle;
+                    finalInfoItems = {};
+                    translatedKeys.forEach((key, index) => { finalInfoItems[key] = translatedValues[index]; });
+                } catch (e) { showToast('상세 정보 번역 실패'); }
             }
-        
             const infoGridHtml = Object.entries(finalInfoItems).map(([key, value]) => {
                 if (!value || String(value).toLowerCase() === '정보 없음' || String(value).trim() === '') return '';
                 return `<div class="info-item"><p class="info-label">${key}</p><p class="info-value">${value}</p></div>`;
             }).join('');
-        
             content.innerHTML = `
-                <div class="detail-hero">
-                    ${imageURL ? `<img src="${imageURL}" alt="${title}" class="detail-image">` : ''}
-                    <div class="detail-text-content">
-                        <h1 class="detail-title">${title}</h1>
-                        <p class="detail-subtitle">${subtitle}</p>
-                    </div>
+                <div class="detail-text-content">
+                    <h1 class="detail-title">${title}</h1>
+                    <p class="detail-subtitle">${subtitle}</p>
                 </div>
                 <div class="detail-content" style="padding: 0 1.5rem;">
-                    <div class="info-grid">
-                        ${infoGridHtml}
-                    </div>
+                    <div class="info-grid">${infoGridHtml}</div>
                 </div>`;
         }
         
         async function translate(text, sourceLang, targetLang, isBatch = false) {
-            if (!text || (Array.isArray(text) && text.length === 0)) { return isBatch ? [] : ""; }
-            if (sourceLang === targetLang || !TRANSLATE_API_KEY.startsWith('AIza')) {
-                return isBatch ? (Array.isArray(text) ? text.map(t => t) : [text]) : text;
-            }
+            if (!text || (Array.isArray(text) && text.length === 0)) return isBatch ? [] : "";
+            if (sourceLang === targetLang || !TRANSLATE_API_KEY.startsWith('AIza')) return isBatch ? (Array.isArray(text) ? text.map(t => t) : [text]) : text;
             try {
                 const response = await fetch(`https://translation.googleapis.com/language/translate/v2?key=${TRANSLATE_API_KEY}`, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        q: text, 
-                        target: targetLang, 
-                        source: sourceLang 
-                    }) 
+                    body: JSON.stringify({ q: text, target: targetLang, source: sourceLang }) 
                 });
                 if (!response.ok) throw new Error(`번역 API 오류: ${response.status}`);
                 const data = await response.json();
@@ -1120,10 +819,41 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // --- 바코드 스캐너 기능 ---
-        let isScanning = false;
-        let scanLocked = false;
-        let detectionHistory = [];
+        function addRecentSearch(query) {
+            const index = recentSearches.indexOf(query);
+            if (index > -1) recentSearches.splice(index, 1);
+            recentSearches.unshift(query);
+            if (recentSearches.length > MAX_RECENT_SEARCHES) recentSearches.pop();
+        }
+
+        function displayRecentSearches() {
+            const container = document.getElementById('recentSearchesContainer');
+            if (!container || recentSearches.length === 0) {
+                if(container) container.innerHTML = '';
+                return;
+            }
+            const listItems = recentSearches.map(term => `
+                <div class="recent-search-item" onclick="searchFromRecent('${term.replace(/'/g, "\\'")}')">
+                    <span>${term}</span>
+                    <button class="delete-search-btn" onclick="removeRecentSearch(event, '${term.replace(/'/g, "\\'")}')">×</button>
+                </div>
+            `).join('');
+            container.innerHTML = `
+                <h4 class="recent-searches-title">${getText('recent_searches')}</h4>
+                <div class="recent-searches-list">${listItems}</div>`;
+        }
+
+        function searchFromRecent(term) {
+            getDetailsAndShow(term);
+        }
+
+        function removeRecentSearch(event, term) {
+            event.stopPropagation();
+            recentSearches = recentSearches.filter(t => t !== term);
+            displayRecentSearches();
+        }
+        
+        let isScanning = false, scanLocked = false, detectionHistory = [];
         const STABLE_COUNT = 3;
         
         function openBarcodeScanner() {
@@ -1163,55 +893,43 @@
             scanLocked = false;
             detectionHistory = [];
             Quagga.init({
-                inputStream: { 
-                    name: "Live", 
-                    type: "LiveStream", 
-                    target: document.querySelector('#scanner-viewport'), 
-                    constraints: { 
-                        facingMode: "environment", 
-                        width: { ideal: 1280 }, 
-                        height: { ideal: 720 }, 
-                        focusMode: "continuous" 
-                    } 
-                },
-                locator: { patchSize: "medium", halfSample: true },
+                inputStream: { name: "Live", type: "LiveStream", target: document.querySelector('#scanner-viewport'), constraints: { width: { min: 640, ideal: 1920 }, height: { min: 480, ideal: 1080 }, facingMode: "environment" }, area: { top: "40%", right: "10%", left: "10%", bottom: "40%" } },
+                locator: { patchSize: "small", halfSample: false },
                 numOfWorkers: navigator.hardwareConcurrency || 4,
-                decoder: { 
-                    readers: ["ean_reader", "ean_8_reader", "code_128_reader"], 
-                    multiple: false 
-                },
+                decoder: { readers: ["ean_reader", "ean_8_reader", "code_128_reader"], multiple: false },
                 locate: true
             }, (err) => {
-                if (err) { 
-                    console.error('Quagga 초기화 오류:', err); 
-                    showToast(getText('camera_error')); 
-                    return; 
-                }
+                if (err) { console.error('Quagga 초기화 오류:', err); showToast(getText('camera_error')); return; }
                 Quagga.start(); 
                 isScanning = true;
+                const video = document.querySelector('#scanner-viewport video');
+                if (video) {
+                    video.addEventListener('click', () => {
+                        try {
+                            const track = Quagga.CameraAccess.getActiveTrack();
+                            if (track && typeof track.getCapabilities === 'function') {
+                                const capabilities = track.getCapabilities();
+                                if (capabilities.focusMode && capabilities.focusMode.includes('continuous')) {
+                                    track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] });
+                                    showToast('자동 초점 재설정');
+                                }
+                            }
+                        } catch (e) { console.warn('초점 재설정 기능이 지원되지 않는 기기입니다.', e); }
+                    });
+                }
                 Quagga.onDetected(onBarcodeDetected);
             });
         }
         
         function stopScanning() { 
-            if (isScanning && typeof Quagga !== 'undefined') { 
-                Quagga.offDetected(onBarcodeDetected); 
-                Quagga.stop(); 
-                isScanning = false; 
-            } 
+            if (isScanning && typeof Quagga !== 'undefined') { Quagga.offDetected(onBarcodeDetected); Quagga.stop(); isScanning = false; } 
         }
         
         function searchByManualBarcode() { 
             const barcode = document.getElementById('manualBarcode').value.trim(); 
-            if (barcode.length < 8) { 
-                showToast(getText('invalid_barcode')); 
-                return; 
-            }
+            if (barcode.length < 8) { showToast(getText('invalid_barcode')); return; }
             const normalized = normalizeEAN13(barcode);
-            if (!normalized) { 
-                showToast(getText('invalid_barcode')); 
-                return; 
-            }
+            if (!normalized) { showToast(getText('invalid_barcode')); return; }
             stopScanning(); 
             findProductByBarcode(normalized); 
         }
@@ -1230,18 +948,12 @@
                 
                 if (data[serviceId]?.RESULT?.CODE !== 'INFO-000' || !data[serviceId]?.row) {
                     const productName = await getProductNameFromBarcode(barcode);
-                    if (productName) {
-                        await getDetailsAndShow(productName);
-                    } else {
-                        throw new Error(getText('product_not_found'));
-                    }
+                    if (productName) await getDetailsAndShow(productName);
+                    else throw new Error(getText('product_not_found'));
                 } else {
                     const product = data[serviceId].row[0] || data[serviceId].row;
-                    if (product && product.PRDLST_NM) {
-                        getDetailsAndShow(product.PRDLST_NM);
-                    } else {
-                        throw new Error(getText('product_not_found'));
-                    }
+                    if (product && product.PRDLST_NM) getDetailsAndShow(product.PRDLST_NM, barcode);
+                    else throw new Error(getText('product_not_found'));
                 }
             } catch (error) {
                 console.error('바코드 검색 오류:', error);
@@ -1251,15 +963,12 @@
         }
         
         async function getProductNameFromBarcode(barcode) {
-            const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
             const prompt = `한국 상품 바코드 번호가 '${barcode}'일 때, 이 상품의 가장 정확한 전체 제품 이름(브랜드 포함) 하나만 알려줘. 다른 설명은 모두 제외하고 오직 제품 이름만 응답해줘.`;
             try {
                 const response = await fetch(GEMINI_URL, { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ 
-                        "contents": [{ "parts": [{ "text": prompt }] }] 
-                    }) 
+                    body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }] }) 
                 });
                 if (!response.ok) return null;
                 const data = await response.json();
@@ -1272,5 +981,4 @@
         }
     </script>
 </body>
-
-</html> 
+</html>
