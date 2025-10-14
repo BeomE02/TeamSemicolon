@@ -439,32 +439,22 @@
             const boxData = new Float32Array(numBoxes * (4 + 1 + numClasses));
             
             // Shape [1, 7, 10, 8400] → [8400, 11]로 변환
+            // Sigmoid 함수 정의
+            const sigmoid = (x) => 1 / (1 + Math.exp(-x));
+            
+            // Shape [1, 7, 10, 8400] → [8400, 11]로 변환 (Sigmoid 적용)
             const rawData = output.data;
             for (let i = 0; i < numBoxes; i++) {
-                // x, y, w, h (4개)
+                // x, y, w, h (4개) - 좌표는 그대로
                 for (let j = 0; j < 4; j++) {
                     boxData[i * 11 + j] = rawData[j * numBoxes + i];
                 }
-                // confidence (1개)
-                boxData[i * 11 + 4] = rawData[4 * numBoxes + i];
-                // class scores (6개)
+                // confidence (1개) - Sigmoid 적용
+                boxData[i * 11 + 4] = sigmoid(rawData[4 * numBoxes + i]);
+                // class scores (6개) - Sigmoid 적용
                 for (let j = 0; j < numClasses; j++) {
-                    boxData[i * 11 + 5 + j] = rawData[(5 + j) * numBoxes + i];
+                    boxData[i * 11 + 5 + j] = sigmoid(rawData[(5 + j) * numBoxes + i]);
                 }
-            }
-
-            // 🔍 디버깅: 첫 10개 박스 정보 출력
-            console.log('=== 디버깅: 첫 10개 박스 샘플 ===');
-            for (let i = 0; i < 10; i++) {
-                const offset = i * 11;
-                console.log(`박스 ${i}:`, {
-                    x: boxData[offset + 0].toFixed(2),
-                    y: boxData[offset + 1].toFixed(2),
-                    w: boxData[offset + 2].toFixed(2),
-                    h: boxData[offset + 3].toFixed(2),
-                    conf: boxData[offset + 4].toFixed(4),
-                    classes: Array.from({length: 6}, (_, j) => boxData[offset + 5 + j].toFixed(4))
-                });
             }
             
             // 탐지 결과 파싱
