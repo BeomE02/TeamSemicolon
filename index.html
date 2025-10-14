@@ -65,6 +65,7 @@
         #scanner-viewport, #scanner-viewport video, #scanner-viewport canvas { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         #ai-scanner-viewport { width: 100%; height: 100%; position: relative; }
         #ai-scanner-video { width: 100%; height: 100%; object-fit: cover; }
+        #ai-overlay-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .scan-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .scan-guide { width: 70%; max-width: 300px; height: 120px; position: relative; border: 2px solid #00FF00; }
         .scan-guide-ai { width: 85%; max-width: 400px; height: 200px; position: relative; border: none; }
@@ -235,33 +236,7 @@
             <div class="scanner-container" id="ai-scanner-container">
                 <div id="ai-scanner-viewport">
                     <video id="ai-scanner-video" autoplay playsinline></video>
-                </div>
-                <div class="scan-overlay">
-                    <div class="scan-guide-ai">
-                        <!-- 네 모서리 -->
-                        <div class="scan-corner top-left"></div>
-                        <div class="scan-corner top-right"></div>
-                        <div class="scan-corner bottom-left"></div>
-                        <div class="scan-corner bottom-right"></div>
-                        
-                        <!-- 스캔 라인 -->
-                        <div class="scan-lines">
-                            <div class="scan-line-horizontal"></div>
-                            <div class="scan-line-vertical"></div>
-                        </div>
-                        
-                        <!-- 그리드 오버레이 -->
-                        <div class="scan-grid"></div>
-                        
-                        <!-- 입자 효과 -->
-                        <div class="scan-particles">
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                            <div class="particle"></div>
-                        </div>
-                    </div>
+                    <canvas id="ai-overlay-canvas"></canvas>
                 </div>
                 <div class="ai-detection-info" id="aiDetectionInfo" style="display:none;"></div>
             </div>
@@ -434,20 +409,56 @@
             ctx.drawImage(video, x, y, video.videoWidth * scale, video.videoHeight * scale);
             canvas.toBlob(async (blob) => {
                 try {
-                    const productClass = await recognizeProductFromImage(blob);
-                    if (productClass && productClass !== lastDetectedClass) {
-                        lastDetectedClass = productClass;
-                        detectionCooldown = true;
-                        const infoEl = document.getElementById('aiDetectionInfo');
-                        infoEl.textContent = `✅ 인식됨: ${productClass}`;
-                        infoEl.style.display = 'block';
-                        infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
-                        if (navigator.vibrate) navigator.vibrate(100);
-                        setTimeout(() => {
-                            detectionCooldown = false; 
-                            lastDetectedClass = null;
-                        }, 2000);
-                    } else if (!productClass) {
+                    const detections = await recognizeProductFromImage(blob);
+                    
+                    // 오버레이 캔버스 가져오기
+                    const overlayCanvas = document.getElementById('ai-overlay-canvas');
+                    const overlayCtx = overlayCanvas.getContext('2d');
+                    overlayCanvas.width = video.videoWidth;
+                    overlayCanvas.height = video.videoHeight;
+                    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                    
+                    if (detections && detections.length > 0) {
+                        // 바운딩 박스 그리기
+                        detections.forEach(det => {
+                            const scaleX = video.videoWidth / AI_MODEL_INPUT_SIZE;
+                            const scaleY = video.videoHeight / AI_MODEL_INPUT_SIZE;
+                            
+                            const boxX = (det.box.x - det.box.w / 2) * scaleX;
+                            const boxY = (det.box.y - det.box.h / 2) * scaleY;
+                            const boxW = det.box.w * scaleX;
+                            const boxH = det.box.h * scaleY;
+                            
+                            // 박스 그리기
+                            overlayCtx.strokeStyle = '#00FF00';
+                            overlayCtx.lineWidth = 3;
+                            overlayCtx.strokeRect(boxX, boxY, boxW, boxH);
+                            
+                            // 라벨 배경
+                            overlayCtx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+                            overlayCtx.fillRect(boxX, boxY - 25, boxW, 25);
+                            
+                            // 라벨 텍스트
+                            overlayCtx.fillStyle = '#000';
+                            overlayCtx.font = 'bold 16px Arial';
+                            overlayCtx.fillText(`${det.className} ${(det.confidence * 100).toFixed(0)}%`, boxX + 5, boxY - 7);
+                        });
+                        
+                        const topDetection = detections[0];
+                        if (topDetection.className !== lastDetectedClass) {
+                            lastDetectedClass = topDetection.className;
+                            detectionCooldown = true;
+                            const infoEl = document.getElementById('aiDetectionInfo');
+                            infoEl.textContent = `✅ 인식됨: ${topDetection.className}`;
+                            infoEl.style.display = 'block';
+                            infoEl.style.background = 'rgba(0, 200, 0, 0.9)';
+                            if (navigator.vibrate) navigator.vibrate(100);
+                            setTimeout(() => {
+                                detectionCooldown = false; 
+                                lastDetectedClass = null;
+                            }, 2000);
+                        }
+                    } else {
                         const infoEl = document.getElementById('aiDetectionInfo');
                         infoEl.textContent = '인식할 수 있는 사물을 비춰주세요';
                         infoEl.style.display = 'block';
@@ -548,12 +559,7 @@
                 console.log(`  - ${det.className}: ${(det.confidence * 100).toFixed(1)}%`);
             });
             
-            // 가장 신뢰도 높은 객체 반환
-            if (nmsDetections.length > 0) {
-                return nmsDetections[0].className;
-            }
-            
-            return null;
+            return nmsDetections;
         }
         
         // NMS (Non-Maximum Suppression) 함수 추가
