@@ -909,15 +909,15 @@
                 }
                 
                 if (details) {
-                    // API 바코드가 있으면 사용
+                    // 혹시 모를 Gemini 바코드 제거
+                    delete details['바코드'];
+                    delete details['바코드 번호'];
+                    
+                    // API 바코드만 추가
                     if(apiBarcode) {
                         details['바코드'] = apiBarcode;
-                        details['바코드 번호'] = apiBarcode;
-                    } else {
-                        // API에 없으면 Gemini 바코드 삭제
-                        delete details['바코드'];
-                        delete details['바코드 번호'];
                     }
+                    
                     showProductDetail(details);
                 } else { throw new Error(getText('errorLoading')); }
             } catch (error) { content.innerHTML = `<div class="no-results">${error.message}</div>`; }
