@@ -427,20 +427,16 @@
             const tensor = await preprocessImage(imageFile);
             const feeds = { images: tensor };
             const results = await productModel.run(feeds);
+            
+            // 🔍 출력 구조 확인 (디버깅용)
+            console.log('=== 모델 출력 분석 ===');
+            console.log('출력 키들:', Object.keys(results));
             const output = results[Object.keys(results)[0]];
-            const predictions = output.data;
-            let maxIndex = 0, maxScore = 0;
-            for (let i = 0; i < predictions.length; i++) {
-                if (predictions[i] > maxScore) {
-                    maxScore = predictions[i];
-                    maxIndex = i;
-                }
-            }
-            if (maxScore >= 0.70) {
-                console.log(`🎯 예측 결과: ${CLASS_NAMES[maxIndex]} (${(maxScore * 100).toFixed(1)}%)`);
-                return CLASS_NAMES[maxIndex];
-            }
-            return null;
+            console.log('출력 shape:', output.dims);
+            console.log('출력 데이터 샘플 (처음 30개):', output.data.slice(0, 30));
+            console.log('총 데이터 개수:', output.data.length);
+            
+            return null; // 임시로 null 반환
         }
         
         async function preprocessImage(imageFile) {
