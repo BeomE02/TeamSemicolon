@@ -924,7 +924,7 @@
         }
 
         async function getGeminiProductDetails(productName) {
-            const prompt = `'${productName}'(이)라는 한국 상품에 대해 구매자가 궁금해할 만한 상세 정보를 알려줘. 항상 **제조사, 제품 카테고리**는 포함해줘. 만약 식품이라면 **칼로리, 영양성분(탄수화물, 단백질, 지방), 전체 성분, 알레르기 정보, 비건 여부**를 추가하고, 화장품이라면 **제품 유형(토너, 앰플 등), 주요 성분, 비건 여부**를 추가해줘. 정보가 없거나 해당 없는 항목은 제외하고, "항목: 값" 형식으로만 나열해줘.`;
+            const prompt = `'${productName}' 상품 정보를 "항목: 값" 형식으로만 나열. 제조사, 제품 카테고리는 필수. 식품이면 칼로리/영양성분/성분/알레르기/비건, 화장품이면 제품유형/주요성분/비건 포함. 설명 없이 데이터만.`;
             try {
                 const response = await fetch(GEMINI_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ "contents": [{ "parts": [{ "text": prompt }] }] }) });
                 if (!response.ok) throw new Error(`Gemini API 오류: Status ${response.status}`);
