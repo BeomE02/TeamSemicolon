@@ -424,19 +424,132 @@
         
         async function recognizeProductFromImage(imageFile) {
             if (!productModel) throw new Error('모델이 로드되지 않았습니다');
+            
             const tensor = await preprocessImage(imageFile);
             const feeds = { images: tensor };
             const results = await productModel.run(feeds);
             
-            // 🔍 출력 구조 확인 (디버깅용)
-            console.log('=== 모델 출력 분석 ===');
-            console.log('출력 키들:', Object.keys(results));
+            // 모델 출력 가져오기
             const output = results[Object.keys(results)[0]];
-            console.log('출력 shape:', output.dims);
-            console.log('출력 데이터 샘플 (처음 30개):', output.data.slice(0, 30));
-            console.log('총 데이터 개수:', output.data.length);
+            const dims = output.dims; // [1, 7, 10, 8400]
             
-            return null; // 임시로 null 반환
+            // 데이터를 올바른 형태로 재구성: [8400, 11]
+            const numBoxes = 8400;
+            const numClasses = 6;
+            const boxData = new Float32Array(numBoxes * (4 + 1 + numClasses));
+            
+            // Shape [1, 7, 10, 8400] → [8400, 11]로 변환
+            const rawData = output.data;
+            for (let i = 0; i < numBoxes; i++) {
+                // x, y, w, h (4개)
+                for (let j = 0; j < 4; j++) {
+                    boxData[i * 11 + j] = rawData[j * numBoxes + i];
+                }
+                // confidence (1개)
+                boxData[i * 11 + 4] = rawData[4 * numBoxes + i];
+                // class scores (6개)
+                for (let j = 0; j < numClasses; j++) {
+                    boxData[i * 11 + 5 + j] = rawData[(5 + j) * numBoxes + i];
+                }
+            }
+            
+            // 탐지 결과 파싱
+            const detections = [];
+            const confThreshold = 0.5; // 신뢰도 임계값
+            
+            for (let i = 0; i < numBoxes; i++) {
+                const offset = i * 11;
+                const objectness = boxData[offset + 4];
+                
+                if (objectness < confThreshold) continue;
+                
+                // 가장 높은 클래스 확률 찾기
+                let maxClassScore = 0;
+                let maxClassIndex = 0;
+                
+                for (let j = 0; j < numClasses; j++) {
+                    const classScore = boxData[offset + 5 + j];
+                    if (classScore > maxClassScore) {
+                        maxClassScore = classScore;
+                        maxClassIndex = j;
+                    }
+                }
+                
+                const finalScore = objectness * maxClassScore;
+                
+                if (finalScore >= confThreshold) {
+                    const x = boxData[offset + 0];
+                    const y = boxData[offset + 1];
+                    const w = boxData[offset + 2];
+                    const h = boxData[offset + 3];
+                    
+                    detections.push({
+                        class: maxClassIndex,
+                        className: CLASS_NAMES[maxClassIndex],
+                        confidence: finalScore,
+                        box: { x, y, w, h }
+                    });
+                }
+            }
+            
+            // NMS (Non-Maximum Suppression) 적용
+            const nmsDetections = applyNMS(detections, 0.45);
+            
+            console.log(`🎯 탐지 결과: ${nmsDetections.length}개 객체 발견`);
+            nmsDetections.forEach(det => {
+                console.log(`  - ${det.className}: ${(det.confidence * 100).toFixed(1)}%`);
+            });
+            
+            // 가장 신뢰도 높은 객체 반환
+            if (nmsDetections.length > 0) {
+                return nmsDetections[0].className;
+            }
+            
+            return null;
+        }
+        
+        // NMS (Non-Maximum Suppression) 함수 추가
+        function applyNMS(detections, iouThreshold) {
+            // 신뢰도 순으로 정렬
+            detections.sort((a, b) => b.confidence - a.confidence);
+            
+            const keep = [];
+            const suppressed = new Set();
+            
+            for (let i = 0; i < detections.length; i++) {
+                if (suppressed.has(i)) continue;
+                
+                keep.push(detections[i]);
+                
+                for (let j = i + 1; j < detections.length; j++) {
+                    if (suppressed.has(j)) continue;
+                    
+                    // 같은 클래스만 비교
+                    if (detections[i].class !== detections[j].class) continue;
+                    
+                    const iou = calculateIoU(detections[i].box, detections[j].box);
+                    if (iou > iouThreshold) {
+                        suppressed.add(j);
+                    }
+                }
+            }
+            
+            return keep;
+        }
+        
+        // IoU (Intersection over Union) 계산
+        function calculateIoU(box1, box2) {
+            const x1 = Math.max(box1.x - box1.w / 2, box2.x - box2.w / 2);
+            const y1 = Math.max(box1.y - box1.h / 2, box2.y - box2.h / 2);
+            const x2 = Math.min(box1.x + box1.w / 2, box2.x + box2.w / 2);
+            const y2 = Math.min(box1.y + box1.h / 2, box2.y + box2.h / 2);
+            
+            const intersection = Math.max(0, x2 - x1) * Math.max(0, y2 - y1);
+            const area1 = box1.w * box1.h;
+            const area2 = box2.w * box2.h;
+            const union = area1 + area2 - intersection;
+            
+            return intersection / union;
         }
         
         async function preprocessImage(imageFile) {
