@@ -452,6 +452,20 @@
                     boxData[i * 11 + 5 + j] = rawData[(5 + j) * numBoxes + i];
                 }
             }
+
+            // 🔍 디버깅: 첫 10개 박스 정보 출력
+            console.log('=== 디버깅: 첫 10개 박스 샘플 ===');
+            for (let i = 0; i < 10; i++) {
+                const offset = i * 11;
+                console.log(`박스 ${i}:`, {
+                    x: boxData[offset + 0].toFixed(2),
+                    y: boxData[offset + 1].toFixed(2),
+                    w: boxData[offset + 2].toFixed(2),
+                    h: boxData[offset + 3].toFixed(2),
+                    conf: boxData[offset + 4].toFixed(4),
+                    classes: Array.from({length: 6}, (_, j) => boxData[offset + 5 + j].toFixed(4))
+                });
+            }
             
             // 탐지 결과 파싱
             const detections = [];
