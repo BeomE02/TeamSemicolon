@@ -345,20 +345,28 @@
                 document.getElementById('splash').classList.add('fade-out');
             }, 2500);
 
-            const appTitle = document.getElementById('appTitle');
             setTimeout(() => {
-                appTitle.innerHTML = '';
-                typeWriter(appTitle, '한국 제품을<br>쉽게 찾아보세요', 100);
+                const appTitle = document.getElementById('appTitle');
+                const initialTitle = getText('appTitle'); // 현재 언어에 맞는 텍스트를 가져옵니다.
+                typeWriter(appTitle, initialTitle, 100);
             }, 3000);
 
             function typeWriter(element, text, speed) {
                 let i = 0;
+                element.innerHTML = ''; // 시작 전 내용을 비웁니다.
                 const typing = () => {
                     if (i < text.length) {
-                        element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
-                        i++;
+                        // '<br>' 태그를 만나면 한 번에 추가하고 인덱스를 4칸 이동
+                        if (text.substring(i, i + 4) === '<br>') {
+                            element.innerHTML = text.substring(0, i + 4) + '<span class="typing-cursor"></span>';
+                            i += 4;
+                        } else {
+                            element.innerHTML = text.substring(0, i + 1) + '<span class="typing-cursor"></span>';
+                            i++;
+                        }
                         setTimeout(typing, speed);
                     } else {
+                        // 애니메이션이 끝나면 커서 제거
                         element.innerHTML = text;
                     }
                 };
@@ -688,7 +696,7 @@
         }
         
         function updateUITexts() {
-            document.getElementById('appTitle').innerHTML = getText('appTitle');
+            // document.getElementById('appTitle').innerHTML = getText('appTitle'); // 이 줄이 삭제된 상태입니다.
             document.getElementById('appSubtitle').textContent = getText('appSubtitle');
             document.getElementById('searchByName').textContent = getText('searchByName');
             document.getElementById('searchByNameDesc').textContent = getText('searchByNameDesc');
@@ -707,6 +715,12 @@
             currentLang = selector.value;
             await translateUIRealtime(currentLang);
             updateUITexts();
+        
+            // 👇 이 부분이 추가되었습니다!
+            const appTitle = document.getElementById('appTitle');
+            const newTitleText = getText('appTitle');
+            typeWriter(appTitle, newTitleText, 50); // 언어 변경 시에는 조금 더 빠른 속도로 실행
+        
             await translateProductCache(currentLang);
         }
 
