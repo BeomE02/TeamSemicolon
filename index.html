@@ -315,7 +315,7 @@
         async function loadAIModel() {
             try {
                 showToast(getText('model_loading'));
-                const modelURL = 'https://rawcdn.githack.com/BeomE02/TeamSemicolon/d3190d98ac55aa2fefbdc1dccdb0d6839daf11e0/best.onnx';
+                const modelURL = 'https://rawcdn.githack.com/BeomE02/TeamSemicolon/d3190d98ac55aa2fefbdc1dccdb0d6839daf11e0/best.onnx'; //1
                 productModel = await ort.InferenceSession.create(modelURL);
                 console.log('AI 모델 로드 완료');
             } catch (error) {
