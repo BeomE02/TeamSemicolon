@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -137,18 +138,6 @@
             </div> 
             
             <div class="search-options"> 
-                <div class="search-option" onclick="showPage('searchResults')"> 
-                    <div class="option-icon"> 
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"> 
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /> 
-                        </svg> 
-                    </div>
-                    <div class="option-info"> 
-                        <h3 class="option-title" id="searchByName">상품명 검색</h3> 
-                        <p class="option-desc" id="searchByNameDesc">이름이나 브랜드로 제품 찾기</p> 
-                    </div> 
-                </div> 
-                
                 <div class="search-option" onclick="openBarcodeScanner()"> 
                     <div class="option-icon"> 
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"> 
@@ -172,6 +161,18 @@
                         <p class="option-desc" id="searchByImageDesc">카메라로 제품을 비추면 자동 인식</p>
                     </div>
                 </div>
+
+                <div class="search-option" onclick="showPage('searchResults')"> 
+                    <div class="option-icon"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"> 
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /> 
+                        </svg> 
+                    </div>
+                    <div class="option-info"> 
+                        <h3 class="option-title" id="searchByName">상품명 검색</h3> 
+                        <p class="option-desc" id="searchByNameDesc">이름이나 브랜드로 제품 찾기</p> 
+                    </div> 
+                </div> 
             </div> 
             <div class="credit-footer">
                 <img src="ditlogo.png" alt="DIT Logo" class="credit-logo">
@@ -251,8 +252,8 @@
     <script>
         // --- API & 설정 ---
         const FOOD_API_KEY = 'c320de96f22d4183bd13';
-        const TRANSLATE_API_KEY = 'AIzaSyArr1P7f6JuAL8Xz8ECiHi8WkfbNRn4Z7I';
-        const GEMINI_API_KEY = 'AIzaSyDrsbT0bzRyi1WOA3byzJI8VOIY2NpYa6Y';
+        const TRANSLATE_API_KEY = 'AIzaSyAg0mabgEL-U3ntRxivf2rZvdf96xv6uro';
+        const GEMINI_API_KEY = 'AIzaSyAsP8UrOBsiqI4xMuTdM5Am3BSnRcg_kVI';
         const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key=${GEMINI_API_KEY}`;
         const PROXY_URL = 'https://corsproxy.io/?';
         const FOOD_API_BASE = `https://openapi.foodsafetykorea.go.kr/api/${FOOD_API_KEY}/C005/json`;
@@ -276,17 +277,19 @@
 
         // --- AI 모델 클래스 이름 ---
         const CLASS_NAMES = [
-            'chocopie',   // 0
-            'tonk',       // 1  
-            'coffee',     // 2
-            'milk',       // 3
+            'chocopie',     // 2
+            'coffee',       // 3
             'getorade',   // 4
-            'almond'      // 5
+            'milk',
+            'ohyes',
+            'tonk',
+            'almond'       // 1  
         ];
-
+        
         const CLASS_BARCODES = {
-            'chocopie': '8801117535398',
+            'chocopie': '8801117539818',
             'tonk': '8801117269203',
+            'ohyes': '8801019308598',
             'coffee': '8801121652022',
             'milk': '8801121112380',
             'getorade': '8801056052256',
@@ -543,7 +546,7 @@
             
             // 탐지 결과 파싱
             const detections = [];
-            const confThreshold = 0.5; // 신뢰도 임계값
+            const confThreshold = 0.35; // 신뢰도 임계값
             
             for (let i = 0; i < numBoxes; i++) {
                 const offset = i * 11;
